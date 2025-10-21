@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>栄養士向け献立自動化プロトタイプ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <h1>特養向け 献立管理システム（プロトタイプ）</h1>
+            <p>※ 本システムは静的サイトのため、献立の自動組込機能は含まれず、手動入力の栄養チェック機能のみ実装しています。</p>
+        </header>
+
+        <main>
+            <section class="nutrition-status">
+                <h2>栄養基準と合計栄養価</h2>
+                <div class="input-group">
+                    <label>目標タンパク質（g/日）：</label>
+                    <input type="number" v-model.number="targetProtein" placeholder="体重*1.2で計算">
+                </div>
+                
+                <div class="result-box">
+                    <p>本日合計カロリー：**{{ totalKcal }} kcal**</p>
+                    <p>本日合計タンパク質：
+                        <strong :class="{ 'over-target': totalProtein >= targetProtein }">
+                            {{ totalProtein }} g
+                        </strong> 
+                        <span class="note">（目標: {{ targetProtein }} g）</span>
+                        <span v-if="totalProtein >= targetProtein" class="ok-mark">✅ 達成</span>
+                        <span v-else class="ng-mark">⚠️ 不足</span>
+                    </p>
+                </div>
+            </section>
+            
+            <hr>
+
+            <section>
+                <h2>1日献立表 ({{ currentDate }})</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>主食</th>
+                            <th>主菜</th>
+                            <th>副菜1</th>
+                            <th>副菜2</th>
+                            <th>汁物/デザート</th>
+                            <th>原価</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(meal, index) in meals" :key="index">
+                            <td>{{ meal.time }} <br>({{ meal.costLimit }}円以内)</td>
+                            <td>{{ meal.items.stapleFood }}</td>
+                            <td>{{ meal.items.mainDish }} <span class="cost">({{ meal.nutrition.mainDish.cost }}円)</span></td>
+                            <td>{{ meal.items.sideDish1 }}</td>
+                            <td>{{ meal.items.sideDish2 || 'ー' }}</td>
+                            <td>{{ meal.items.soupOrDessert || 'ー' }}</td>
+                            <td>**{{ meal.totalCost }}円**</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Menu Automation Prototype. Built with Vue.js on GitHub Pages.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Vue.jsアプリケーションの設定
+        Vue.createApp({
+            data() {
+                return {
+                    currentDate: '2025年11月1日 (金)',
+                    // ユーザーが入力する目標タンパク質（体重70kg * 1.2 = 84gをデフォルトに）
+                    targetProtein: 84, 
+                    // 献立データと栄養価（データベースの代わり）
+                    meals: [
+                        { 
+                            time: '朝食', costLimit: 200, 
+                            items: { stapleFood: '全粥', mainDish: '厚揚げの煮物（豆腐）', sideDish1: 'ほうれん草のお浸し', soupOrDessert: '味噌汁', sideDish2: '' },
+                            // 栄養価のダミーデータ（実際のレシピのデータが入る想定）
+                            nutrition: { mainDish: { protein: 12, kcal: 150, Va: 50, cost: 80 } },
+                            totalCost: 195, totalKcal: 350
+                        },
+                        { 
+                            time: '昼食', costLimit: 500, 
+                            items: { stapleFood: 'ご飯', mainDish: '鶏むね肉の照り焼き（肉）', sideDish1: '人参とピーマンの炒め物', sideDish2: 'ひじきの煮物', soupOrDessert: 'リンゴゼリー' },
+                            nutrition: { mainDish: { protein: 25, kcal: 280, Va: 200, cost: 250 } },
+                            totalCost: 480, totalKcal: 650
+                        },
+                        { 
+                            time: '夕食', costLimit: 500, 
+                            items: { stapleFood: 'ご飯', mainDish: '鮭の味噌漬け焼き（魚）', sideDish1: '冬瓜とエビの餡かけ', sideDish2: 'きんぴらごぼう', soupOrDessert: '吸い物' },
+                            nutrition: { mainDish: { protein: 22, kcal: 250, Va: 100, cost: 230 } },
+                            totalCost: 490, totalKcal: 600
+                        }
+                    ]
+                };
+            },
+            computed: {
+                // 全ての食事の合計タンパク質を計算
+                totalProtein() {
+                    // 全主菜のタンパク質を合計するロジック（実際は副菜等も含める）
+                    return this.meals.reduce((sum, meal) => sum + (meal.nutrition.mainDish?.protein || 0), 0);
+                },
+                // 全ての食事の合計カロリーを計算
+                totalKcal() {
+                    return this.meals.reduce((sum, meal) => sum + (meal.totalKcal || 0), 0);
+                }
+                // Va, 塩分などの合計計算もここに追加
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

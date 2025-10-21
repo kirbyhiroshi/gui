@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>栄養士向け献立自動化プロトタイプ</title>
+    <title>栄養士向け献立管理システム - 1ヶ月分</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -11,59 +11,44 @@
 
     <div id="app">
         <header>
-            <h1>特養向け 献立管理システム（プロトタイプ）</h1>
-            <p>※ 本システムは静的サイトのため、献立の自動組込機能は含まれず、手動入力の栄養チェック機能のみ実装しています。</p>
+            <h1>特養向け 献立管理システム（1ヶ月プロトタイプ）</h1>
+            <p>日付を列、献立項目を行とした縦型表示です。スクロールして全30日分を確認できます。</p>
         </header>
 
         <main>
-            <section class="nutrition-status">
-                <h2>栄養基準と合計栄養価</h2>
-                <div class="input-group">
-                    <label>目標タンパク質（g/日）：</label>
-                    <input type="number" v-model.number="targetProtein" placeholder="体重*1.2で計算">
-                </div>
-                
-                <div class="result-box">
-                    <p>本日合計カロリー：**{{ totalKcal }} kcal**</p>
-                    <p>本日合計タンパク質：
-                        <strong :class="{ 'over-target': totalProtein >= targetProtein }">
-                            {{ totalProtein }} g
-                        </strong> 
-                        <span class="note">（目標: {{ targetProtein }} g）</span>
-                        <span v-if="totalProtein >= targetProtein" class="ok-mark">✅ 達成</span>
-                        <span v-else class="ng-mark">⚠️ 不足</span>
-                    </p>
-                </div>
-            </section>
             
-            <hr>
-
-            <section>
-                <h2>1日献立表 ({{ currentDate }})</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>時間</th>
-                            <th>主食</th>
-                            <th>主菜</th>
-                            <th>副菜1</th>
-                            <th>副菜2</th>
-                            <th>汁物/デザート</th>
-                            <th>原価</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(meal, index) in meals" :key="index">
-                            <td>{{ meal.time }} <br>({{ meal.costLimit }}円以内)</td>
-                            <td>{{ meal.items.stapleFood }}</td>
-                            <td>{{ meal.items.mainDish }} <span class="cost">({{ meal.nutrition.mainDish.cost }}円)</span></td>
-                            <td>{{ meal.items.sideDish1 }}</td>
-                            <td>{{ meal.items.sideDish2 || 'ー' }}</td>
-                            <td>{{ meal.items.soupOrDessert || 'ー' }}</td>
-                            <td>**{{ meal.totalCost }}円**</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <section class="menu-container">
+                <h2>1ヶ月献立表 (ダミーデータ)</h2>
+                
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="fixed-column">献立項目</th>
+                                <th v-for="(day, index) in dates" :key="index">
+                                    {{ day.day }}<br>({{ day.weekday }})
+                                </th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            <template v-for="(row, index) in monthlyMenuStructure" :key="index">
+                                <tr v-if="index > 0 && monthlyMenuStructure[index-1].time !== row.time" class="meal-break">
+                                    <td colspan="31"></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="fixed-column">
+                                        <strong>{{ row.time }}</strong><br>{{ row.type }}
+                                    </td>
+                                    <td v-for="(item, dayIndex) in row.items" :key="dayIndex">
+                                        {{ item }}
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </main>
 
@@ -73,48 +58,55 @@
     </div>
 
     <script>
+        // ダミーデータ生成用
+        const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
+        const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
+        const DUMMY_SOUP = ['味噌汁', '澄まし汁', 'すまし汁'];
+        const DUMMY_DESSERT = ['ゼリー', 'プリン', 'ヨーグルト'];
+        const DUMMY_BREAKFAST_MAIN = ['卵焼き(卵)', '豆腐の煮物(豆腐)', 'スクランブルエッグ(卵)', '納豆(豆腐)'];
+        const DUMMY_STAPLE = ['ご飯', '全粥', 'パン'];
+
+        // 30日分のダミーデータを生成する関数
+        const generateDummyData = (list) => {
+            const data = [];
+            for (let i = 0; i < 30; i++) {
+                data.push(list[i % list.length]);
+            }
+            return data;
+        };
+
         // Vue.jsアプリケーションの設定
         Vue.createApp({
             data() {
                 return {
-                    currentDate: '2025年11月1日 (金)',
-                    // ユーザーが入力する目標タンパク質（体重70kg * 1.2 = 84gをデフォルトに）
-                    targetProtein: 84, 
-                    // 献立データと栄養価（データベースの代わり）
-                    meals: [
-                        { 
-                            time: '朝食', costLimit: 200, 
-                            items: { stapleFood: '全粥', mainDish: '厚揚げの煮物（豆腐）', sideDish1: 'ほうれん草のお浸し', soupOrDessert: '味噌汁', sideDish2: '' },
-                            // 栄養価のダミーデータ（実際のレシピのデータが入る想定）
-                            nutrition: { mainDish: { protein: 12, kcal: 150, Va: 50, cost: 80 } },
-                            totalCost: 195, totalKcal: 350
-                        },
-                        { 
-                            time: '昼食', costLimit: 500, 
-                            items: { stapleFood: 'ご飯', mainDish: '鶏むね肉の照り焼き（肉）', sideDish1: '人参とピーマンの炒め物', sideDish2: 'ひじきの煮物', soupOrDessert: 'リンゴゼリー' },
-                            nutrition: { mainDish: { protein: 25, kcal: 280, Va: 200, cost: 250 } },
-                            totalCost: 480, totalKcal: 650
-                        },
-                        { 
-                            time: '夕食', costLimit: 500, 
-                            items: { stapleFood: 'ご飯', mainDish: '鮭の味噌漬け焼き（魚）', sideDish1: '冬瓜とエビの餡かけ', sideDish2: 'きんぴらごぼう', soupOrDessert: '吸い物' },
-                            nutrition: { mainDish: { protein: 22, kcal: 250, Va: 100, cost: 230 } },
-                            totalCost: 490, totalKcal: 600
-                        }
+                    // 30日分のヘッダー情報（ダミー）
+                    dates: Array.from({ length: 30 }, (_, i) => ({
+                        day: `${i + 1}日`,
+                        weekday: ['月', '火', '水', '木', '金', '土', '日'][i % 7]
+                    })),
+                    
+                    // 縦型テーブル表示用のデータ構造
+                    monthlyMenuStructure: [
+                        // 朝食 (4品)
+                        { time: '朝食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
+                        { time: '朝食', type: '主菜', items: generateDummyData(DUMMY_BREAKFAST_MAIN) },
+                        { time: '朝食', type: '副菜', items: generateDummyData(DUMMY_SIDE) },
+                        { time: '朝食', type: '汁物', items: generateDummyData(DUMMY_SOUP) },
+                        
+                        // 昼食 (5品)
+                        { time: '昼食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
+                        { time: '昼食', type: '主菜', items: generateDummyData(DUMMY_MAIN) },
+                        { time: '昼食', type: '副菜1', items: generateDummyData(DUMMY_SIDE) },
+                        { time: '昼食', type: '副菜2', items: generateDummyData(DUMMY_SIDE.slice(2)) },
+                        { time: '昼食', type: 'デザート', items: generateDummyData(DUMMY_DESSERT) },
+                        
+                        // 夕食 (4品)
+                        { time: '夕食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
+                        { time: '夕食', type: '主菜', items: generateDummyData(DUMMY_MAIN.reverse()) },
+                        { time: '夕食', type: '副菜1', items: generateDummyData(DUMMY_SIDE.slice(1)) },
+                        { time: '夕食', type: '副菜2', items: generateDummyData(DUMMY_SIDE.slice(3)) },
                     ]
                 };
-            },
-            computed: {
-                // 全ての食事の合計タンパク質を計算
-                totalProtein() {
-                    // 全主菜のタンパク質を合計するロジック（実際は副菜等も含める）
-                    return this.meals.reduce((sum, meal) => sum + (meal.nutrition.mainDish?.protein || 0), 0);
-                },
-                // 全ての食事の合計カロリーを計算
-                totalKcal() {
-                    return this.meals.reduce((sum, meal) => sum + (meal.totalKcal || 0), 0);
-                }
-                // Va, 塩分などの合計計算もここに追加
             }
         }).mount('#app');
     </script>

@@ -16,10 +16,11 @@ header {
 }
 
 main {
-    width: 98%; 
+    width: 95%; 
+    max-width: 1200px;
     margin: 30px auto;
     background-color: white;
-    padding: 20px 10px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
@@ -29,68 +30,87 @@ h2 {
     border-bottom: 2px solid #e9ecef;
     padding-bottom: 10px;
     margin-top: 0;
-    margin-left: 10px;
 }
 
-/* 献立テーブルのラッパー（横スクロール可能にする） */
-.table-wrapper {
-    overflow-x: auto;
-    margin-top: 15px;
-}
-
-table {
-    min-width: 1500px; 
-    border-collapse: collapse;
-    margin: 0 auto;
-}
-
-th, td {
-    border: 1px solid #dee2e6;
-    padding: 8px 5px;
-    text-align: left; /* ★修正: 表内のテキストを左寄せ（横書き）に */
-    vertical-align: top; /* 上端揃えにして見やすく */
-    width: 3%; 
-    white-space: normal; /* ★修正: 折り返しを許可 */
+/* カレンダーグリッドの全体構造 */
+.calendar-wrapper {
+    display: grid;
+    /* 7列のカレンダーを定義 */
+    grid-template-columns: repeat(7, 1fr); 
+    border: 1px solid #ccc; /* 全体を囲む線 */
     font-size: 0.9em;
+    gap: 0; /* マス間の隙間をなくす */
 }
 
-/* 日付ヘッダーは中央揃えを維持 */
-th {
-    background-color: #f1f3f5;
-    color: #343a40;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    text-align: center; /* 日付は中央揃えを維持 */
+/* 曜日ヘッダー */
+.weekday-header {
+    background-color: #4a6fa5; /* ヘッダーを濃い色に */
+    color: white;
+    padding: 10px 5px;
+    text-align: center;
+    font-weight: bold;
+    border-right: 1px solid #ccc;
+}
+/* 曜日の色分け */
+.weekday-header:nth-child(6) { background-color: #8bb2db; } /* 土曜日 */
+.weekday-header:nth-child(7) { background-color: #dc3545; } /* 日曜日 */
+
+/* 個別の日付マス */
+.calendar-day {
+    min-height: 250px; /* マスの高さを確保 */
+    border-right: 1px solid #ccc;
+    border-top: 1px solid #ccc; /* 日付マスの上線を引く */
+    padding: 5px;
+    background-color: white;
+    overflow: hidden; /* 内容がはみ出さないように */
+}
+/* 日曜と土曜のマスの色分け */
+.sunday { background-color: #fcebeb; } 
+.saturday { background-color: #e0f2ff; } 
+
+/* 日付ヘッダー (マス内の日付部分) */
+.date-header {
+    font-weight: bold;
+    text-align: right;
+    margin-bottom: 5px;
+    color: #4a6fa5;
 }
 
-/* 固定列（献立項目）のスタイル */
-.fixed-column {
-    position: sticky;
-    left: 0;
-    background-color: #f7f7f7 !important;
-    z-index: 20;
-    width: 100px !important; 
-    min-width: 100px !important;
-    text-align: left !important;
+.day-number {
+    font-size: 1.2em;
+    margin-right: 5px;
 }
 
-/* 朝食・昼食・夕食の区切り行 */
-.meal-break td {
-    height: 10px;
-    background-color: #e9ecef;
-    border: none;
+/* 献立の各食事ブロック */
+.meal-plan {
+    margin-top: 5px;
+}
+.meal-block {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee; /* 食事ごとの薄い区切り線 */
+}
+
+.meal-time-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 1px 4px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 3px;
+    color: #333;
+}
+
+.dish-list {
+    list-style: none;
     padding: 0;
+    margin: 0;
 }
-
-/* ★新規追加: 7日ごとの縦の区切り線 */
-.week-separator {
-    /* 7日目の右側に太い線を追加 */
-    border-right: 3px solid #ced4da; 
-    padding-right: 5px;
-    box-sizing: border-box; /* paddingやborderが幅に影響しないように */
-    min-height: 100%; /* セル全体に適用 */
-    display: block; /* border-rightが効くように */
+.dish-list li {
+    line-height: 1.2;
+    font-size: 0.8em;
+    color: #555;
 }
 
 /* フッター */

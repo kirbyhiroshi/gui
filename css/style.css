@@ -1,0 +1,115 @@
+/* 基本設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #343a40;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #4a6fa5; /* 落ち着いた青色 */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+main {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    color: #4a6fa5;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+/* 栄養基準エリア */
+.nutrition-status {
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.result-box {
+    background-color: #e9f0f9;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.result-box strong {
+    font-size: 1.2em;
+}
+
+/* 達成・不足マーク */
+.over-target {
+    color: #28a745; /* 緑色 */
+    font-weight: bold;
+}
+
+.ok-mark {
+    color: #28a745;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.ng-mark {
+    color: #dc3545; /* 赤色 */
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.note {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+/* 献立テーブル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f1f3f5;
+    color: #343a40;
+}
+
+td:first-child {
+    font-weight: bold;
+    background-color: #f7f7f7;
+    text-align: center;
+}
+
+.cost {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+/* フッター */
+footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9em;
+    color: #6c757d;
+}

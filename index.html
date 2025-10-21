@@ -12,7 +12,7 @@
     <div id="app">
         <header>
             <h1>特養向け 献立管理システム（カレンダープロトタイプ）</h1>
-            <p>1ヶ月分の献立をカレンダー形式で表示します。日付ごとに朝・昼・夕の献立を確認できます。</p>
+            <p>1ヶ月分の献立をカレンダー形式で表示します。2枚目の画像を参考にレイアウトを修正しました。</p>
         </header>
 
         <main>
@@ -20,8 +20,8 @@
             <section class="menu-container">
                 <h2>1ヶ月献立表 (ダミーデータ)</h2>
                 
-                <div class="calendar-grid">
-                    
+                <div class="calendar-wrapper">
+
                     <div class="weekday-header" v-for="day in weekdays" :key="day">{{ day }}</div>
 
                     <div 
@@ -31,12 +31,12 @@
                         :class="{'sunday': dayData.weekday === '日', 'saturday': dayData.weekday === '土'}"
                     >
                         <div class="date-header">
-                            {{ dayData.day }} ({{ dayData.weekday }})
+                            <span class="day-number">{{ dayData.day }}</span> ({{ dayData.weekday }})
                         </div>
 
                         <div class="meal-plan">
                             <div v-for="(meal, mealIndex) in dayData.meals" :key="mealIndex" class="meal-block">
-                                <span class="meal-time-label">{{ meal.time }}:</span>
+                                <span class="meal-time-label">{{ meal.time }}</span>
                                 <ul class="dish-list">
                                     <li>主菜: {{ meal.mainDish }}</li>
                                     <li>副菜: {{ meal.sideDish1 }} / {{ meal.sideDish2 || 'ー' }}</li>
@@ -54,7 +54,7 @@
     </div>
 
     <script>
-        // ダミーデータ生成用 (前回と同様)
+        // ダミーデータ生成用
         const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
         const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
         const DUMMY_BREAKFAST_MAIN = ['卵焼き(卵)', '豆腐の煮物(豆腐)', 'スクランブルエッグ(卵)', '納豆(豆腐)'];
@@ -71,19 +71,23 @@
         // Vue.jsアプリケーションの設定
         Vue.createApp({
             data() {
-                // 30日分のカレンダーデータを生成
-                const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
-                const monthlyData = Array.from({ length: 30 }, (_, i) => {
+                // 30日分のカレンダーデータを生成 (1日目を月曜スタート、つまりindex 0は月曜)
+                const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
+                const daysInMonth = 30;
+                const monthlyData = Array.from({ length: daysInMonth }, (_, i) => {
                     return {
-                        day: `${i + 1}日`,
-                        weekday: daysOfWeek[(i + 1) % 7], // 1日目を月曜スタートとするため +1
+                        day: `${i + 1}`, // 日付の数字のみ
+                        weekday: daysOfWeek[i % 7],
                         meals: generateMenu(i)
                     };
                 });
-                
+
+                // カレンダーの表示開始位置を調整するための空のマスを生成 (今回は1日目を月曜としたため不要だが、必要に応じて追加する)
+                const paddingDays = 0; 
+
                 return {
                     weekdays: daysOfWeek,
-                    // カレンダーに表示する30日分のデータ
+                    // カレンダーに表示する30日分のデータ (前に空のマスを追加する場合はここに結合する)
                     monthlyData: monthlyData,
                 };
             }

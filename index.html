@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>栄養士向け献立管理システム - 1ヶ月分</title>
+    <title>栄養士向け献立管理システム - 1ヶ月分 (週区切り)</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -12,7 +12,7 @@
     <div id="app">
         <header>
             <h1>特養向け 献立管理システム（1ヶ月プロトタイプ）</h1>
-            <p>日付を列、献立項目を行とした縦型表示です。スクロールして全30日分を確認できます。</p>
+            <p>週単位で区切り線が入った縦型表示です。表内のテキストは横書きになっています。</p>
         </header>
 
         <main>
@@ -42,7 +42,9 @@
                                         <strong>{{ row.time }}</strong><br>{{ row.type }}
                                     </td>
                                     <td v-for="(item, dayIndex) in row.items" :key="dayIndex">
-                                        {{ item }}
+                                        <div :class="{'week-separator': (dayIndex + 1) % 7 === 0 && dayIndex < 29}">
+                                            {{ item }}
+                                        </div>
                                     </td>
                                 </tr>
                             </template>
@@ -58,7 +60,7 @@
     </div>
 
     <script>
-        // ダミーデータ生成用
+        // ダミーデータ生成用 (前回と同様)
         const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
         const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
         const DUMMY_SOUP = ['味噌汁', '澄まし汁', 'すまし汁'];
@@ -68,47 +70,3 @@
 
         // 30日分のダミーデータを生成する関数
         const generateDummyData = (list) => {
-            const data = [];
-            for (let i = 0; i < 30; i++) {
-                data.push(list[i % list.length]);
-            }
-            return data;
-        };
-
-        // Vue.jsアプリケーションの設定
-        Vue.createApp({
-            data() {
-                return {
-                    // 30日分のヘッダー情報（ダミー）
-                    dates: Array.from({ length: 30 }, (_, i) => ({
-                        day: `${i + 1}日`,
-                        weekday: ['月', '火', '水', '木', '金', '土', '日'][i % 7]
-                    })),
-                    
-                    // 縦型テーブル表示用のデータ構造
-                    monthlyMenuStructure: [
-                        // 朝食 (4品)
-                        { time: '朝食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
-                        { time: '朝食', type: '主菜', items: generateDummyData(DUMMY_BREAKFAST_MAIN) },
-                        { time: '朝食', type: '副菜', items: generateDummyData(DUMMY_SIDE) },
-                        { time: '朝食', type: '汁物', items: generateDummyData(DUMMY_SOUP) },
-                        
-                        // 昼食 (5品)
-                        { time: '昼食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
-                        { time: '昼食', type: '主菜', items: generateDummyData(DUMMY_MAIN) },
-                        { time: '昼食', type: '副菜1', items: generateDummyData(DUMMY_SIDE) },
-                        { time: '昼食', type: '副菜2', items: generateDummyData(DUMMY_SIDE.slice(2)) },
-                        { time: '昼食', type: 'デザート', items: generateDummyData(DUMMY_DESSERT) },
-                        
-                        // 夕食 (4品)
-                        { time: '夕食', type: '主食', items: generateDummyData(DUMMY_STAPLE) },
-                        { time: '夕食', type: '主菜', items: generateDummyData(DUMMY_MAIN.reverse()) },
-                        { time: '夕食', type: '副菜1', items: generateDummyData(DUMMY_SIDE.slice(1)) },
-                        { time: '夕食', type: '副菜2', items: generateDummyData(DUMMY_SIDE.slice(3)) },
-                    ]
-                };
-            }
-        }).mount('#app');
-    </script>
-</body>
-</html>

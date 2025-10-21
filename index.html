@@ -1,113 +1,93 @@
-/* 基本設定 (前回と共通) */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #343a40;
-    margin: 0;
-    padding: 0;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>栄養士向け献立管理システム - カレンダー表示</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
 
-header {
-    background-color: #4a6fa5;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+    <div id="app">
+        <header>
+            <h1>特養向け 献立管理システム（カレンダープロトタイプ）</h1>
+            <p>1ヶ月分の献立をカレンダー形式で表示します。日付ごとに朝・昼・夕の献立を確認できます。</p>
+        </header>
 
-main {
-    width: 95%; /* カレンダーに十分な幅を確保 */
-    max-width: 1200px;
-    margin: 30px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-}
+        <main>
+            
+            <section class="menu-container">
+                <h2>1ヶ月献立表 (ダミーデータ)</h2>
+                
+                <div class="calendar-grid">
+                    
+                    <div class="weekday-header" v-for="day in weekdays" :key="day">{{ day }}</div>
 
-h2 {
-    color: #4a6fa5;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-top: 0;
-}
+                    <div 
+                        v-for="(dayData, index) in monthlyData" 
+                        :key="index" 
+                        class="calendar-day"
+                        :class="{'sunday': dayData.weekday === '日', 'saturday': dayData.weekday === '土'}"
+                    >
+                        <div class="date-header">
+                            {{ dayData.day }} ({{ dayData.weekday }})
+                        </div>
 
-/* カレンダーグリッドのスタイル */
-.calendar-grid {
-    display: grid;
-    /* 1週間に7列のグリッドを定義 */
-    grid-template-columns: repeat(7, 1fr); 
-    border-top: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-    font-size: 0.9em;
-}
+                        <div class="meal-plan">
+                            <div v-for="(meal, mealIndex) in dayData.meals" :key="mealIndex" class="meal-block">
+                                <span class="meal-time-label">{{ meal.time }}:</span>
+                                <ul class="dish-list">
+                                    <li>主菜: {{ meal.mainDish }}</li>
+                                    <li>副菜: {{ meal.sideDish1 }} / {{ meal.sideDish2 || 'ー' }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
 
-/* 曜日ヘッダー */
-.weekday-header {
-    background-color: #e9ecef;
-    padding: 10px 5px;
-    text-align: center;
-    font-weight: bold;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-}
-/* 日曜と土曜のヘッダーの色分け */
-.weekday-header:first-child { color: #dc3545; } /* 日曜日 */
-.weekday-header:last-child { color: #007bff; }  /* 土曜日 */
+        <footer>
+            <p>&copy; 2025 Menu Automation Prototype. Built with Vue.js on GitHub Pages.</p>
+        </footer>
+    </div>
 
+    <script>
+        // ダミーデータ生成用 (前回と同様)
+        const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
+        const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
+        const DUMMY_BREAKFAST_MAIN = ['卵焼き(卵)', '豆腐の煮物(豆腐)', 'スクランブルエッグ(卵)', '納豆(豆腐)'];
 
-/* 個別の日付マス */
-.calendar-day {
-    min-height: 180px; /* ある程度の高さを確保 */
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 5px;
-    background-color: white;
-}
-/* 日曜と土曜のマスの色分け */
-.sunday { background-color: #fcebeb; } /* 日曜日 */
-.saturday { background-color: #e0f2ff; } /* 土曜日 */
+        const generateMenu = (dayIndex) => {
+            // ダミーデータをローテーションで割り当てる
+            return [
+                { time: '朝', mainDish: DUMMY_BREAKFAST_MAIN[dayIndex % DUMMY_BREAKFAST_MAIN.length], sideDish1: DUMMY_SIDE[dayIndex % DUMMY_SIDE.length] },
+                { time: '昼', mainDish: DUMMY_MAIN[dayIndex % DUMMY_MAIN.length], sideDish1: DUMMY_SIDE[(dayIndex + 1) % DUMMY_SIDE.length], sideDish2: DUMMY_SIDE[(dayIndex + 2) % DUMMY_SIDE.length] },
+                { time: '夕', mainDish: DUMMY_MAIN[(dayIndex + 2) % DUMMY_MAIN.length], sideDish1: DUMMY_SIDE[(dayIndex + 3) % DUMMY_SIDE.length], sideDish2: DUMMY_SIDE[(dayIndex + 4) % DUMMY_SIDE.length] }
+            ];
+        };
 
-
-/* 日付ヘッダー */
-.date-header {
-    font-weight: bold;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px dotted #ccc;
-    text-align: right;
-}
-
-/* 献立の各食事ブロック */
-.meal-block {
-    margin-bottom: 8px;
-    border-left: 3px solid #4a6fa5; /* 食事ごとの区切り線 */
-    padding-left: 5px;
-}
-
-.meal-time-label {
-    font-weight: bold;
-    color: #4a6fa5;
-    display: block; /* 時間を強調 */
-    margin-bottom: 3px;
-}
-
-.dish-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.dish-list li {
-    line-height: 1.3;
-    font-size: 0.85em;
-    color: #555;
-}
-
-/* フッター */
-footer {
-    text-align: center;
-    padding: 15px;
-    font-size: 0.9em;
-    color: #6c757d;
-    margin-top: 30px;
-}
+        // Vue.jsアプリケーションの設定
+        Vue.createApp({
+            data() {
+                // 30日分のカレンダーデータを生成
+                const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+                const monthlyData = Array.from({ length: 30 }, (_, i) => {
+                    return {
+                        day: `${i + 1}日`,
+                        weekday: daysOfWeek[(i + 1) % 7], // 1日目を月曜スタートとするため +1
+                        meals: generateMenu(i)
+                    };
+                });
+                
+                return {
+                    weekdays: daysOfWeek,
+                    // カレンダーに表示する30日分のデータ
+                    monthlyData: monthlyData,
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

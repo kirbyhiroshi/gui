@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>栄養士向け献立管理システム - 1ヶ月分 (週区切り)</title>
+    <title>栄養士向け献立管理システム - カレンダー表示</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
@@ -11,8 +11,8 @@
 
     <div id="app">
         <header>
-            <h1>特養向け 献立管理システム（1ヶ月プロトタイプ）</h1>
-            <p>週単位で区切り線が入った縦型表示です。表内のテキストは横書きになっています。</p>
+            <h1>特養向け 献立管理システム（カレンダープロトタイプ）</h1>
+            <p>1ヶ月分の献立をカレンダー形式で表示します。日付ごとに朝・昼・夕の献立を確認できます。</p>
         </header>
 
         <main>
@@ -20,36 +20,28 @@
             <section class="menu-container">
                 <h2>1ヶ月献立表 (ダミーデータ)</h2>
                 
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="fixed-column">献立項目</th>
-                                <th v-for="(day, index) in dates" :key="index">
-                                    {{ day.day }}<br>({{ day.weekday }})
-                                </th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            <template v-for="(row, index) in monthlyMenuStructure" :key="index">
-                                <tr v-if="index > 0 && monthlyMenuStructure[index-1].time !== row.time" class="meal-break">
-                                    <td colspan="31"></td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="fixed-column">
-                                        <strong>{{ row.time }}</strong><br>{{ row.type }}
-                                    </td>
-                                    <td v-for="(item, dayIndex) in row.items" :key="dayIndex">
-                                        <div :class="{'week-separator': (dayIndex + 1) % 7 === 0 && dayIndex < 29}">
-                                            {{ item }}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
+                <div class="calendar-grid">
+                    
+                    <div class="weekday-header" v-for="day in weekdays" :key="day">{{ day }}</div>
+
+                    <div 
+                        v-for="(dayData, index) in monthlyData" 
+                        :key="index" 
+                        class="calendar-day"
+                        :class="{'sunday': dayData.weekday === '日', 'saturday': dayData.weekday === '土'}"
+                    >
+                        <div class="date-header">{{ dayData.day }} ({{ dayData.weekday }})</div>
+
+                        <div class="meal-plan">
+                            <div v-for="(meal, mealIndex) in dayData.meals" :key="mealIndex" class="meal-block">
+                                <span class="meal-time-label">{{ meal.time }}:</span>
+                                <ul class="dish-list">
+                                    <li>主菜: {{ meal.mainDish }}</li>
+                                    <li>副菜: {{ meal.sideDish1 }} / {{ meal.sideDish2 || 'ー' }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -63,10 +55,9 @@
         // ダミーデータ生成用 (前回と同様)
         const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
         const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
-        const DUMMY_SOUP = ['味噌汁', '澄まし汁', 'すまし汁'];
-        const DUMMY_DESSERT = ['ゼリー', 'プリン', 'ヨーグルト'];
         const DUMMY_BREAKFAST_MAIN = ['卵焼き(卵)', '豆腐の煮物(豆腐)', 'スクランブルエッグ(卵)', '納豆(豆腐)'];
-        const DUMMY_STAPLE = ['ご飯', '全粥', 'パン'];
 
-        // 30日分のダミーデータを生成する関数
-        const generateDummyData = (list) => {
+        const generateMenu = (dayIndex) => {
+            // ダミーデータをローテーションで割り当てる
+            return [
+                { time: '朝', mainDish: DUMMY_BREAKFAST_MAIN[dayIndex % DUMMY_BREAKFAST_MAIN.length], sideDish

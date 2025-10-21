@@ -1,4 +1,4 @@
-/* 基本設定 */
+/* 基本設定 (前回と共通) */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
@@ -8,7 +8,7 @@ body {
 }
 
 header {
-    background-color: #4a6fa5; /* 落ち着いた青色 */
+    background-color: #4a6fa5;
     color: white;
     padding: 20px;
     text-align: center;
@@ -16,7 +16,7 @@ header {
 }
 
 main {
-    width: 98%; /* 幅を広く使用 */
+    width: 98%; 
     margin: 30px auto;
     background-color: white;
     padding: 20px 10px;
@@ -34,12 +34,11 @@ h2 {
 
 /* 献立テーブルのラッパー（横スクロール可能にする） */
 .table-wrapper {
-    overflow-x: auto; /* 横スクロールを可能にする */
+    overflow-x: auto;
     margin-top: 15px;
 }
 
 table {
-    /* 最小幅を設定し、コンテンツがはみ出したらスクロールする */
     min-width: 1500px; 
     border-collapse: collapse;
     margin: 0 auto;
@@ -47,29 +46,30 @@ table {
 
 th, td {
     border: 1px solid #dee2e6;
-    padding: 8px 5px; /* パディングを調整してセルを小さく */
-    text-align: center;
-    vertical-align: middle;
-    width: 3%; /* 日付の列幅を均等に */
-    white-space: nowrap; /* テキストの折り返しを防ぐ */
+    padding: 8px 5px;
+    text-align: left; /* ★修正: 表内のテキストを左寄せ（横書き）に */
+    vertical-align: top; /* 上端揃えにして見やすく */
+    width: 3%; 
+    white-space: normal; /* ★修正: 折り返しを許可 */
     font-size: 0.9em;
 }
 
+/* 日付ヘッダーは中央揃えを維持 */
 th {
     background-color: #f1f3f5;
     color: #343a40;
-    position: sticky; /* スクロールしても項目名が表示されるようにする */
+    position: sticky;
     top: 0;
     z-index: 10;
+    text-align: center; /* 日付は中央揃えを維持 */
 }
 
 /* 固定列（献立項目）のスタイル */
 .fixed-column {
-    /* 左端の列を固定する */
     position: sticky;
     left: 0;
-    background-color: #f7f7f7 !important; /* 背景色を強調 */
-    z-index: 20; /* 日付ヘッダーより前面に */
+    background-color: #f7f7f7 !important;
+    z-index: 20;
     width: 100px !important; 
     min-width: 100px !important;
     text-align: left !important;
@@ -78,9 +78,19 @@ th {
 /* 朝食・昼食・夕食の区切り行 */
 .meal-break td {
     height: 10px;
-    background-color: #e9ecef; /* 薄い区切り線 */
+    background-color: #e9ecef;
     border: none;
     padding: 0;
+}
+
+/* ★新規追加: 7日ごとの縦の区切り線 */
+.week-separator {
+    /* 7日目の右側に太い線を追加 */
+    border-right: 3px solid #ced4da; 
+    padding-right: 5px;
+    box-sizing: border-box; /* paddingやborderが幅に影響しないように */
+    min-height: 100%; /* セル全体に適用 */
+    display: block; /* border-rightが効くように */
 }
 
 /* フッター */

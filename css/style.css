@@ -16,11 +16,10 @@ header {
 }
 
 main {
-    width: 90%;
-    max-width: 1000px;
+    width: 98%; /* 幅を広く使用 */
     margin: 30px auto;
     background-color: white;
-    padding: 30px;
+    padding: 20px 10px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
@@ -30,80 +29,58 @@ h2 {
     border-bottom: 2px solid #e9ecef;
     padding-bottom: 10px;
     margin-top: 0;
-}
-
-/* 栄養基準エリア */
-.nutrition-status {
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    margin-bottom: 20px;
-}
-
-.input-group {
-    margin-bottom: 15px;
-}
-
-.result-box {
-    background-color: #e9f0f9;
-    padding: 15px;
-    border-radius: 4px;
-}
-
-.result-box strong {
-    font-size: 1.2em;
-}
-
-/* 達成・不足マーク */
-.over-target {
-    color: #28a745; /* 緑色 */
-    font-weight: bold;
-}
-
-.ok-mark {
-    color: #28a745;
-    font-weight: bold;
     margin-left: 10px;
 }
 
-.ng-mark {
-    color: #dc3545; /* 赤色 */
-    font-weight: bold;
-    margin-left: 10px;
+/* 献立テーブルのラッパー（横スクロール可能にする） */
+.table-wrapper {
+    overflow-x: auto; /* 横スクロールを可能にする */
+    margin-top: 15px;
 }
 
-.note {
-    font-size: 0.8em;
-    color: #6c757d;
-}
-
-/* 献立テーブル */
 table {
-    width: 100%;
+    /* 最小幅を設定し、コンテンツがはみ出したらスクロールする */
+    min-width: 1500px; 
     border-collapse: collapse;
-    margin-top: 20px;
+    margin: 0 auto;
 }
 
 th, td {
     border: 1px solid #dee2e6;
-    padding: 10px;
-    text-align: left;
+    padding: 8px 5px; /* パディングを調整してセルを小さく */
+    text-align: center;
+    vertical-align: middle;
+    width: 3%; /* 日付の列幅を均等に */
+    white-space: nowrap; /* テキストの折り返しを防ぐ */
+    font-size: 0.9em;
 }
 
 th {
     background-color: #f1f3f5;
     color: #343a40;
+    position: sticky; /* スクロールしても項目名が表示されるようにする */
+    top: 0;
+    z-index: 10;
 }
 
-td:first-child {
-    font-weight: bold;
-    background-color: #f7f7f7;
-    text-align: center;
+/* 固定列（献立項目）のスタイル */
+.fixed-column {
+    /* 左端の列を固定する */
+    position: sticky;
+    left: 0;
+    background-color: #f7f7f7 !important; /* 背景色を強調 */
+    z-index: 20; /* 日付ヘッダーより前面に */
+    width: 100px !important; 
+    min-width: 100px !important;
+    text-align: left !important;
 }
 
-.cost {
-    font-size: 0.8em;
-    color: #6c757d;
+/* 朝食・昼食・夕食の区切り行 */
+.meal-break td {
+    height: 10px;
+    background-color: #e9ecef; /* 薄い区切り線 */
+    border: none;
+    padding: 0;
 }
 
 /* フッター */
@@ -112,4 +89,5 @@ footer {
     padding: 15px;
     font-size: 0.9em;
     color: #6c757d;
+    margin-top: 30px;
 }

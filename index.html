@@ -3,95 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>栄養士向け献立管理システム - カレンダー表示</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>JavaScriptテストページ</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div id="app">
-        <header>
-            <h1>特養向け 献立管理システム <span style="font-size: 0.8em;">（カレンダープロトタイプ）</span></h1>
-            <p>1ヶ月分の献立をカレンダー形式で表示します。2枚目の画像を参考にレイアウトを修正しました。</p>
-        </header>
-
-        <main>
-            
-            <section class="menu-container">
-                <h2>1ヶ月献立表 (ダミーデータ)</h2>
-                
-                <div class="calendar-wrapper">
-
-                    <div class="weekday-header" v-for="day in weekdays" :key="day">{{ day }}</div>
-
-                    <div 
-                        v-for="(dayData, index) in monthlyData" 
-                        :key="index" 
-                        class="calendar-day"
-                        :class="{'sunday': dayData.weekday === '日', 'saturday': dayData.weekday === '土'}"
-                    >
-                        <div class="date-header">
-                            <span class="day-number">{{ dayData.day }}</span> ({{ dayData.weekday }})
-                        </div>
-
-                        <div class="meal-plan">
-                            <div v-for="(meal, mealIndex) in dayData.meals" :key="mealIndex" class="meal-block">
-                                <span class="meal-time-label">{{ meal.time }}</span>
-                                <ul class="dish-list">
-                                    <li>主菜: {{ meal.mainDish }}</li>
-                                    <li>副菜: {{ meal.sideDish1 }} / {{ meal.sideDish2 || 'ー' }}</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>&copy; 2025 Menu Automation Prototype. Built with Vue.js on GitHub Pages.</p>
-        </footer>
-    </div>
-
-    <script>
-        // ダミーデータ生成用
-        const DUMMY_MAIN = ['鶏肉の照り焼き(肉)', '鮭のムニエル(魚)', '豚肉の生姜焼き(肉)', '鯖の味噌煮(魚)'];
-        const DUMMY_SIDE = ['ほうれん草のお浸し', '人参とピーマンの炒め物', 'ひじきの煮物', 'きんぴらごぼう', '冬瓜の餡かけ'];
-        const DUMMY_BREAKFAST_MAIN = ['卵焼き(卵)', '豆腐の煮物(豆腐)', 'スクランブルエッグ(卵)', '納豆(豆腐)'];
-
-        const generateMenu = (dayIndex) => {
-            // ダミーデータをローテーションで割り当てる
-            return [
-                { time: '朝', mainDish: DUMMY_BREAKFAST_MAIN[dayIndex % DUMMY_BREAKFAST_MAIN.length], sideDish1: DUMMY_SIDE[dayIndex % DUMMY_SIDE.length] },
-                { time: '昼', mainDish: DUMMY_MAIN[dayIndex % DUMMY_MAIN.length], sideDish1: DUMMY_SIDE[(dayIndex + 1) % DUMMY_SIDE.length], sideDish2: DUMMY_SIDE[(dayIndex + 2) % DUMMY_SIDE.length] },
-                { time: '夕', mainDish: DUMMY_MAIN[(dayIndex + 2) % DUMMY_MAIN.length], sideDish1: DUMMY_SIDE[(dayIndex + 3) % DUMMY_SIDE.length], sideDish2: DUMMY_SIDE[(dayIndex + 4) % DUMMY_SIDE.length] }
-            ];
-        };
-
-        // Vue.jsアプリケーションの設定
-        Vue.createApp({
-            data() {
-                // 30日分のカレンダーデータを生成 (1日目を月曜スタート、つまりindex 0は月曜)
-                const daysOfWeek = ['月', '火', '水', '木', '金', '土', '日'];
-                const daysInMonth = 30;
-                const monthlyData = Array.from({ length: daysInMonth }, (_, i) => {
-                    return {
-                        day: `${i + 1}`, // 日付の数字のみ
-                        weekday: daysOfWeek[i % 7],
-                        meals: generateMenu(i)
-                    };
-                });
-
-                // カレンダーの表示開始位置を調整するための空のマスを生成 (今回は1日目を月曜としたため不要だが、必要に応じて追加する)
-                const paddingDays = 0; 
-
-                return {
-                    weekdays: daysOfWeek,
-                    // カレンダーに表示する30日分のデータ (前に空のマスを追加する場合はここに結合する)
-                    monthlyData: monthlyData,
-                };
-            }
-        }).mount('#app');
-    </script>
+    <h1>JavaScriptテスト</h1>
+    
+    <button id="myButton">クリックしてください</button>
+    
+    <p id="message"></p>
+    
+    <script src="script.js"></script>
 </body>
 </html>

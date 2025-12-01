@@ -1,56 +1,54 @@
-// HTML要素を取得
-const display = document.getElementById('display');
-const buttons = document.querySelector('.buttons');
+// =======================================================
+// イベントリスナー：ボタンのクリックを監視
+// =======================================================
 
-// 計算の状態を管理するための変数
-let firstOperand = null; // 最初のオペランド（被演算子）
-let operator = null;     // 選択された演算子
-let waitingForSecondOperand = false; // 2番目のオペランド入力待ちかどうか
-
-// 画面に表示されている値を返す関数
-const getDisplayValue = () => display.value;
-
-/**
- * 数字（オペランド）を入力処理
- * @param {string} input - クリックされた数字または小数点
- */
-function inputDigit(input) {
-    if (waitingForSecondOperand === true) {
-        // 演算子が押された後なら、表示をリセットして2番目のオペランド入力を開始
-        display.value = input;
-        waitingForSecondOperand = false;
-    } else {
-        // 現在の値に追加
-        if (getDisplayValue() === '0' || getDisplayValue() === 'Error') {
-            display.value = input; // '0'を新しい数字に置き換える
-        } else {
-            display.value = getDisplayValue() + input;
-        }
-    }
-}
-
-/**
- * 小数点処理
- */
-function inputDecimal() {
-    // 2番目のオペランド入力待ちなら、'0.'から開始
-    if (waitingForSecondOperand === true) {
-        display.value = '0.';
-        waitingForSecondOperand = false;
+buttons.addEventListener('click', (event) => {
+    if (!event.target.matches('.btn')) {
         return;
     }
+
+    const target = event.target;
+    const action = target.dataset.action; 
     
-    // 小数点がすでになければ追加
-    if (!getDisplayValue().includes('.')) {
-        display.value += '.';
+    // 現在の表示値
+    const currentValue = getDisplayValue();
+
+    // --- 数字・小数点の処理 ---
+    if (target.classList.contains('number') || target.classList.contains('decimal')) {
+        if (target.textContent === '.') {
+            inputDecimal();
+        } else {
+            inputDigit(target.textContent);
+        }
+
+    // --- 演算子の処理 ---
+    } else if (target.classList.contains('operator')) {
+        // 演算子（+,-,*,/）が押された場合
+        handleOperator(action);
+
+    // --- イコールボタンの処理 (修正箇所) ---
+    } else if (action === 'calculate') {
+        // イコールが押されたら、現在の表示値と保存されているオペランドを使って計算
+        if (firstOperand !== null && operator !== null) {
+            const inputValue = parseFloat(currentValue);
+            const result = calculate(firstOperand, inputValue, operator);
+            
+            // 結果を表示
+            display.value = String(result);
+            
+            // 状態をリセットし、結果を次の最初のオペランドとして保持
+            firstOperand = result;
+            operator = null; // 演算子をクリア
+            waitingForSecondOperand = true; // 計算後なので次の数字は新規入力と見なす
+
+            // Errorの場合は完全にリセット
+            if (display.value === 'Error') {
+                resetCalculator();
+            }
+        }
+        
+    // --- クリアボタンの処理 ---
+    } else if (action === 'clear') {
+        resetCalculator();
     }
-}
-
-/**
- * 演算子処理
- * @param {string} nextOperator - クリックされた演算子
- */
-function handleOperator(nextOperator) {
-    const inputValue = parseFloat(getDisplayValue());
-
-    // 最初のオペランドがまだ
+});

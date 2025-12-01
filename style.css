@@ -1,1 +1,100 @@
+/* 基本的なリセット */
+body {
+    font-family: Arial, sans-serif;
+    display: flex; /* 中央寄せのためにFlexboxを使用 */
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
 
+/* 電卓本体のコンテナ */
+.calculator {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 300px; /* 電卓の幅を設定 */
+}
+
+/* 結果表示画面 */
+.display {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 2em;
+    text-align: right;
+    border: none;
+    border-radius: 5px;
+    background-color: #222;
+    color: white;
+    box-sizing: border-box; /* paddingを含めて幅100%になるように調整 */
+}
+
+/* ボタン群のコンテナ */
+.buttons {
+    display: grid;
+    /* 1:1:1:1の4列グリッドを作成 */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px; /* ボタン間のスペース */
+}
+
+/* すべてのボタンの共通スタイル */
+.btn {
+    padding: 20px 0;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+/* 数字とドットボタン */
+.btn.number, .btn.decimal {
+    background-color: #666;
+    color: white;
+}
+.btn.number:hover, .btn.decimal:hover {
+    background-color: #888;
+}
+
+/* 演算子ボタン */
+.btn.operator {
+    background-color: #f9a602;
+    color: white;
+}
+.btn.operator:hover {
+    background-color: #ffb732;
+}
+
+/* クリアボタン (AC) */
+.btn.clear {
+    background-color: #d9534f;
+    color: white;
+    /* ACボタンを3列分に広げる */
+    grid-column: span 3;
+}
+.btn.clear:hover {
+    background-color: #e56763;
+}
+
+/* イコールボタン */
+.btn.equal {
+    background-color: #5cb85c;
+    color: white;
+    /* イコールボタンを2行分に広げる */
+    grid-row: span 2;
+    /* 5行目の最後の位置（4列目）に配置するために、 grid-column: 4; も設定できるが、
+       HTMLの順番とGridのフローで適切な位置に来るように調整している */
+}
+.btn.equal:hover {
+    background-color: #6cc66c;
+}
+
+/* 0ボタンを2列分に広げる */
+.btn.zero {
+    grid-column: span 2;
+    text-align: left;
+    padding-left: 30px;
+}

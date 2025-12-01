@@ -1,123 +1,22 @@
-/* 基本設定 (前回と共通) */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #343a40;
-    margin: 0;
-    padding: 0;
-}
-
-header {
-    background-color: #4a6fa5;
-    color: white;
-    padding: 20px;
+    font-family: Arial, sans-serif;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
 }
 
-main {
-    width: 95%; 
-    max-width: 1200px;
-    margin: 30px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-}
-
-h2 {
-    color: #4a6fa5;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-top: 0;
-}
-
-/* カレンダーグリッドの全体構造 */
-.calendar-wrapper {
-    display: grid;
-    /* 7列のカレンダーを定義 */
-    grid-template-columns: repeat(7, 1fr); 
-    border: 1px solid #ccc; /* 全体を囲む線 */
-    font-size: 0.9em;
-    gap: 0; /* マス間の隙間をなくす */
-}
-
-/* 曜日ヘッダー */
-.weekday-header {
-    background-color: #4a6fa5; /* ヘッダーを濃い色に */
+#myButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
     color: white;
-    padding: 10px 5px;
-    text-align: center;
-    font-weight: bold;
-    border-right: 1px solid #ccc;
-}
-/* 曜日の色分け */
-.weekday-header:nth-child(6) { background-color: #8bb2db; } /* 土曜日 */
-.weekday-header:nth-child(7) { background-color: #dc3545; } /* 日曜日 */
-
-/* 個別の日付マス */
-.calendar-day {
-    min-height: 250px; /* マスの高さを確保 */
-    border-right: 1px solid #ccc;
-    border-top: 1px solid #ccc; /* 日付マスの上線を引く */
-    padding: 5px;
-    background-color: white;
-    overflow: hidden; /* 内容がはみ出さないように */
-}
-/* 日曜と土曜のマスの色分け */
-.sunday { background-color: #fcebeb; } 
-.saturday { background-color: #e0f2ff; } 
-
-/* 日付ヘッダー (マス内の日付部分) */
-.date-header {
-    font-weight: bold;
-    text-align: right;
-    margin-bottom: 5px;
-    color: #4a6fa5;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
-.day-number {
-    font-size: 1.2em;
-    margin-right: 5px;
-}
-
-/* 献立の各食事ブロック */
-.meal-plan {
-    margin-top: 5px;
-}
-.meal-block {
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #eee; /* 食事ごとの薄い区切り線 */
-}
-
-.meal-time-label {
-    font-size: 0.8em;
-    font-weight: bold;
-    background-color: #f0f0f0;
-    padding: 1px 4px;
-    border-radius: 3px;
-    display: inline-block;
-    margin-bottom: 3px;
+#message {
+    font-size: 18px;
     color: #333;
-}
-
-.dish-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.dish-list li {
-    line-height: 1.2;
-    font-size: 0.8em;
-    color: #555;
-}
-
-/* フッター */
-footer {
-    text-align: center;
-    padding: 15px;
-    font-size: 0.9em;
-    color: #6c757d;
-    margin-top: 30px;
+    font-weight: bold;
 }

@@ -85,8 +85,6 @@ body {
     color: white;
     /* イコールボタンを2行分に広げる */
     grid-row: span 2;
-    /* 5行目の最後の位置（4列目）に配置するために、 grid-column: 4; も設定できるが、
-       HTMLの順番とGridのフローで適切な位置に来るように調整している */
 }
 .btn.equal:hover {
     background-color: #6cc66c;

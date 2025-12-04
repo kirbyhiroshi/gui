@@ -1,15 +1,12 @@
 // HTML要素を取得
 const getMealBtn = document.getElementById('get-meal-btn');
 const mealDisplay = document.getElementById('meal-display');
-
-// ジャンル（地域）チェックボックス - name="area"
-const areaCheckboxes = document.querySelectorAll('input[name="area"]');
-// 食材（カテゴリー）チェックボックス - name="category"
-const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
+const checkboxes = document.querySelectorAll('input[name="cuisine"]');
 
 // TheMealDBのエンドポイント
-const LIST_API_URL_AREA = 'https://www.themealdb.com/api/json/v1/1/filter.php?a=';
-const LIST_API_URL_CATEGORY = 'https://www.themealdb.com/api/json/v1/1/filter.php?c=';
+// 料理一覧を地域で絞り込むAPI
+const LIST_API_URL = 'https://www.themealdb.com/api/json/v1/1/filter.php?a=';
+// 料理の詳細情報をIDで取得するAPI
 const DETAIL_API_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=';
 
 
@@ -19,82 +16,53 @@ const DETAIL_API_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=';
 async function getRandomMeal() {
     mealDisplay.innerHTML = '<p>献立を選んでいます...少々お待ちください⏳</p>';
 
-    // 1. 選択されたジャンル（地域）とカテゴリーを取得
-    const selectedAreas = Array.from(areaCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
-    
-    // カテゴリーはカンマ区切りでまとめられている場合があるため、flat()で平坦化
-    const selectedCategories = Array.from(categoryCheckboxes)
+    // 1. 選択されたジャンル（地域）を取得
+    const selectedAreas = Array.from(checkboxes)
         .filter(cb => cb.checked)
-        .map(cb => cb.value.split(','))
-        .flat(); 
-    
-    // 選択された検索条件を全て格納する配列を作成
-    const allSearchQueries = [];
-    
-    // 地域検索クエリを追加
-    selectedAreas.forEach(area => {
-        allSearchQueries.push({ type: 'area', value: area, url: `${LIST_API_URL_AREA}${area}` });
-    });
+        .map(cb => cb.value);
 
-    // カテゴリー検索クエリを追加
-    selectedCategories.forEach(category => {
-        allSearchQueries.push({ type: 'category', value: category, url: `${LIST_API_URL_CATEGORY}${category}` });
-    });
-
-    // 2. 検索条件のチェック
-    if (allSearchQueries.length === 0) {
-        mealDisplay.innerHTML = '<p>献立のジャンルまたは食材を1つ以上選択してください！</p>';
+    if (selectedAreas.length === 0) {
+        mealDisplay.innerHTML = '<p>献立のジャンルを1つ以上選択してください！</p>';
         return;
     }
 
     try {
-        // 3. 全ての検索クエリを並列実行し、結果を待つ
-        const fetchPromises = allSearchQueries.map(query => 
-            fetch(query.url)
-                .then(response => {
-                    if (!response.ok) {
-                        console.warn(`APIエラー (${query.type}: ${query.value}): ${response.status}`);
-                        return null; 
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    console.error(`Fetchエラー (${query.type}: ${query.value}):`, error);
-                    return null; 
-                })
-        );
-
-        const results = await Promise.all(fetchPromises);
+        // 2. 選択された地域ごとに料理リストを取得し、一つの配列にまとめる
+        let mealIds = [];
         
-        // 4. 全てのリストを結合し、重複を排除（Setを使用）
-        let allMealIds = new Set();
-        
-        results.forEach(data => {
-            if (data && data.meals && Array.isArray(data.meals)) {
-                data.meals.forEach(meal => allMealIds.add(meal.idMeal));
+        for (const area of selectedAreas) {
+            const response = await fetch(`${LIST_API_URL}${area}`);
+            if (!response.ok) {
+                console.warn(`地域: ${area} のデータ取得に失敗しました。`);
+                continue; // 失敗しても他の地域に進む
             }
-        });
+            const data = await response.json();
+            
+            // 料理IDのみを抽出してリストに追加
+            if (data.meals) {
+                const ids = data.meals.map(meal => meal.idMeal);
+                mealIds = mealIds.concat(ids);
+            }
+        }
         
-        // 5. 料理が見つからなかった場合の処理
-        const finalMealIds = Array.from(allMealIds);
-
-        if (finalMealIds.length === 0) {
-            mealDisplay.innerHTML = '<p>選択された条件に一致する料理が見つかりませんでした😔</p>';
+        // 3. 取得した全料理リストからランダムで一つ選択
+        if (mealIds.length === 0) {
+            mealDisplay.innerHTML = '<p>選択されたジャンルに一致する料理が見つかりませんでした😔</p>';
             return;
         }
 
-        // 6. ランダムにIDを選択し、詳細情報を取得
-        const randomIndex = Math.floor(Math.random() * finalMealIds.length);
-        const randomMealId = finalMealIds[randomIndex];
+        const randomIndex = Math.floor(Math.random() * mealIds.length);
+        const randomMealId = mealIds[randomIndex];
         
+        // 4. 選択した料理IDの詳細情報を取得
         const detailResponse = await fetch(`${DETAIL_API_URL}${randomMealId}`);
         if (!detailResponse.ok) {
-             throw new Error(`料理の詳細情報取得に失敗しました。ステータス: ${detailResponse.status}`);
+            throw new Error(`料理の詳細情報取得に失敗しました。`);
         }
         const detailData = await detailResponse.json();
         const meal = detailData.meals[0];
 
-        // 7. 画面に表示
+        // 5. 画面に表示
         if (meal) {
             displayMeal(meal);
         } else {
@@ -102,4 +70,38 @@ async function getRandomMeal() {
         }
 
     } catch (error) {
-        console
+        console.error('献立の取得中にエラーが発生しました:', error);
+        mealDisplay.innerHTML = `<p>エラーが発生しました: ${error.message}</p><p>インターネット接続やAPIの状況を確認してください。</p>`;
+    }
+}
+
+
+/**
+ * 取得した料理の詳細を画面に描画する関数
+ * このバージョンでは、翻訳は行わず、英語のまま表示します。
+ * 翻訳機能を再度追加する場合は、この関数をさらに拡張する必要があります。
+ */
+function displayMeal(meal) {
+    // 取得したデータから必要な情報を取得
+    const mealName = meal.strMeal || '料理名不明';
+    const category = meal.strCategory || '不明';
+    const area = meal.strArea || '不明';
+    const thumbnail = meal.strMealThumb;
+    const instructions = meal.strInstructions || '作り方情報なし';
+    const sourceLink = meal.strSource;
+
+    const mealHtml = `
+        <h2>${mealName}</h2>
+        <p>カテゴリー: <strong>${category}</strong></p>
+        <p>地域: <strong>${area}</strong></p>
+        ${thumbnail ? `<img src="${thumbnail}" alt="${mealName}の画像">` : ''}
+        <p>作り方の簡単なヒント: ${instructions.substring(0, 150) + '...'}</p>
+        ${sourceLink ? `<p><a href="${sourceLink}" target="_blank">レシピの詳細を見る 🔗</a></p>` : ''}
+    `;
+    
+    mealDisplay.innerHTML = mealHtml;
+}
+
+
+// ボタンが押されたらgetRandomMeal関数を実行するように設定
+getMealBtn.addEventListener('click', getRandomMeal);

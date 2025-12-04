@@ -1,93 +1,30 @@
-/* style.css */
+/* style.css (差分のみ記載) */
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f9;
-    color: #333;
-    margin: 0;
-    padding: 20px;
-}
+/* 既存のスタイル... */
 
-.container {
-    max-width: 600px;
-    margin: 40px auto;
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-    color: #007bff;
+/* 新規追加・修正 */
+h2 {
+    color: #009688; /* グリーン系の色に変更 */
     text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
+    margin: 20px 0 10px;
 }
 
-.input-group {
-    margin-bottom: 15px;
+hr {
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 20px 0;
 }
 
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-/* 入力欄と選択欄のスタイルを統一 */
-.input-group input[type="number"],
-.input-group select {
-    width: 95%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+/* 繰り上げ返済による削減効果のスタイル */
+#prepaymentSavings {
     font-size: 16px;
-    box-sizing: border-box; /* paddingを含めたサイズにする */
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #218838;
-}
-
-.result-box {
-    background-color: #e9f7ef;
-    border: 1px solid #28a745;
-    padding: 20px;
-    border-radius: 5px;
-    margin-top: 30px;
-}
-
-.result-box h3 {
-    margin-top: 0;
-    color: #28a745;
-    font-size: 20px;
-}
-
-.result-value {
-    font-size: 28px;
     font-weight: bold;
-    color: #007bff;
+    color: #009688;
+    background-color: #e0f2f1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #009688;
 }
 
-/* 元金均等返済の補足テキスト用スタイル */
-.note-text {
-    font-size: 14px;
-    color: #555;
-    margin-top: 10px;
-    padding-top: 5px;
-    border-top: 1px dashed #ccc;
-}
+/* 既存のスタイル... */

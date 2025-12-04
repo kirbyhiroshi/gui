@@ -3,67 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>住宅ローン返済額計算機（繰り上げ返済対応）</title>
+    <title>カスタム未来カレンダー | 家計シミュレーション</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="container">
-        <h1>🏠 住宅ローン返済額計算機</h1>
+    <div id="app">
+        <h1>未来カレンダー💰</h1>
         
-        <div class="input-group">
-            <label for="repaymentType">返済方式</label>
-            <select id="repaymentType">
-                <option value="genri">元利均等返済</option>
-                <option value="gankin">元金均等返済</option>
-            </select>
+        <div id="input-area">
+            <h2>初期設定</h2>
+            <div>
+                <label for="current-age">現在の年齢 (世帯主):</label>
+                <input type="number" id="current-age" value="35" min="20" max="100">
+            </div>
+            <div>
+                <label for="initial-asset">初期資産 (万円):</label>
+                <input type="number" id="initial-asset" value="1000" min="0">
+            </div>
+            <div>
+                <label for="annual-income">年間手取り収入 (万円):</label>
+                <input type="number" id="annual-income" value="500" min="0">
+            </div>
+            <button id="run-simulation">シミュレーション実行</button>
         </div>
 
-        <div class="input-group">
-            <label for="loanAmount">借入額（万円）</label>
-            <input type="number" id="loanAmount" value="3000" min="100">
+        <div id="cashflow-area">
+            <h2>キャッシュフロー（未来カレンダー）</h2>
+            <div id="table-container">
+                <table id="cashflow-table">
+                    <thead>
+                        <tr>
+                            <th>経過年数</th>
+                            <th>年齢</th>
+                            <th>収入</th>
+                            <th>支出</th>
+                            <th>年間収支</th>
+                            <th>資産残高</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="input-group">
-            <label for="annualRate">年利（%）</label>
-            <input type="number" id="annualRate" step="0.01" value="1.2" min="0">
-        </div>
-
-        <div class="input-group">
-            <label for="years">返済期間（年）</label>
-            <input type="number" id="years" value="35" min="1">
-        </div>
-
-        <hr>
-        <h2>💰 繰り上げ返済（期間短縮型）</h2>
-
-        <div class="input-group">
-            <label for="prepaymentAmount">繰り上げ返済額（万円）</label>
-            <input type="number" id="prepaymentAmount" value="0" min="0">
-        </div>
-
-        <div class="input-group">
-            <label for="prepaymentYear">繰り上げ返済を行うタイミング（返済開始から何年後か）</label>
-            <input type="number" id="prepaymentYear" value="0" min="0">
-        </div>
-        <hr>
-
-        <button onclick="calculateLoan()">計算する</button>
-
-        <div class="result-box">
-            <h3 id="monthlyPaymentLabel">月々の返済額:</h3>
-            <span id="monthlyPayment" class="result-value">---</span> 円
-            <p id="variablePaymentNote" class="note-text" style="display: none;"></p>
-        </div>
-        
-        <div class="result-box" style="margin-top: 15px;">
-            <h3>総支払額（元金＋利息）:</h3>
-            <span id="totalPayment" class="result-value">---</span> 円
-            <p id="prepaymentSavings" class="note-text" style="margin-top: 10px; display: none;"></p>
-        </div>
-
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>

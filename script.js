@@ -1,3 +1,5 @@
+// script.js (以前提供したコード)
+
 // 金額をカンマ区切りと単位付きの文字列に変換するヘルパー関数
 function formatMoney(amount, unit = '円') {
     return amount.toLocaleString() + ' ' + unit;
@@ -5,7 +7,6 @@ function formatMoney(amount, unit = '円') {
 
 function calculateDeduction() {
     // 1. 入力値の取得と単位の調整
-    // ローン残高は「万円」入力なので「円」に変換
     const loanBalanceMan = parseFloat(document.getElementById('loan-balance').value);
     const loanBalanceYen = loanBalanceMan * 10000; 
     
@@ -23,15 +24,12 @@ function calculateDeduction() {
     }
 
     // --- ステップ 1: 控除対象残高の決定 ---
-    // 年末ローン残高と最大借入限度額（住宅種別）の小さい方
     const deductionTargetBalanceYen = Math.min(loanBalanceYen, limitYen);
     
     // --- ステップ 2: 基本控除額の算出 (0.7%) ---
-    // 控除額は小数点以下切り捨てで計算するのが一般的だが、ここでは簡略化のためそのまま計算
     const basicDeductionYen = Math.floor(deductionTargetBalanceYen * 0.007);
 
     // --- ステップ 3: 所得税からの控除額決定 ---
-    // 基本控除額と源泉徴収税額（所得税）の小さい方
     const incomeTaxDeductionYen = Math.min(basicDeductionYen, incomeTaxYen);
 
     // --- ステップ 4: 住民税からの控除額決定 ---
@@ -47,7 +45,6 @@ function calculateDeduction() {
         // 控除残額と住民税控除上限の小さい方が、住民税から控除される額
         residentTaxDeductionYen = Math.min(deductionRemainder, residentTaxCeiling);
         
-        // マイナスにならないようにMath.floorを適用
         residentTaxDeductionYen = Math.floor(residentTaxDeductionYen);
     }
     

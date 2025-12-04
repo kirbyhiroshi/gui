@@ -1,91 +1,69 @@
 body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background-color: #f4f7f6;
-    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
 }
 
-#simulator-container {
-    max-width: 650px;
-    margin: 0 auto;
-    background-color: white;
-    padding: 30px;
+.container {
+    text-align: center;
+    background: #fff;
+    padding: 40px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%;
 }
 
 h1 {
-    text-align: center;
-    color: #007bff;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
+    color: #4CAF50;
+    margin-bottom: 30px;
 }
 
-h2 {
-    color: #333;
-    margin-top: 25px;
-    border-left: 5px solid #007bff;
-    padding-left: 10px;
-}
-
-/* フォームのスタイル */
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-.input-group input[type="number"], .input-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box; /* paddingを含めたサイズ指定 */
-}
-
-button {
-    width: 100%;
-    padding: 15px;
-    background-color: #28a745; /* グリーン系の実行ボタン */
+#get-meal-btn {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #FF9800; /* 目立つオレンジ色 */
     color: white;
     border: none;
     border-radius: 5px;
-    font-size: 1.1em;
     cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
+    margin-bottom: 30px;
 }
 
-button:hover {
-    background-color: #1e7e34;
+#get-meal-btn:hover {
+    background-color: #f57c00;
 }
 
-/* 結果テーブルのスタイル */
-#results table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-#results th, #results td {
-    border: 1px solid #eee;
-    padding: 12px;
+.meal-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fffaf2;
     text-align: left;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-#results th {
-    background-color: #f8f8f8;
-    width: 60%;
+.meal-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* 合計行の強調 */
-#results tr.total th, #results tr.total td {
-    background-color: #fff3cd; /* 薄い黄色で強調 */
-    font-weight: bold;
-    font-size: 1.1em;
-    color: #856404;
+.meal-card h2 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 10px;
 }

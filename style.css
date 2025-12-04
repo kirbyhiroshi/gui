@@ -10,9 +10,15 @@ body {
 header {
     background-color: #007bff;
     color: white;
-    padding: 20px 0;
+    padding: 20px 0 10px;
     margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header p {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
 main {
@@ -84,10 +90,11 @@ h2 {
 
 #meal-display {
     text-align: left;
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
     padding: 20px;
     border-radius: 8px;
+    min-height: 150px; /* 結果表示エリアの最低高さを確保 */
 }
 
 .meal-card {
@@ -96,16 +103,26 @@ h2 {
     margin-bottom: 10px;
     border-radius: 6px;
     display: flex;
+    flex-direction: column; /* 画面が狭い場合は縦並び */
     gap: 20px;
-    align-items: center;
+    align-items: flex-start;
     background-color: #ffffff;
 }
 
+@media (min-width: 600px) {
+    .meal-card {
+        flex-direction: row; /* 画面が広い場合は横並び */
+        align-items: center;
+    }
+}
+
 .meal-card img {
-    width: 150px;
-    height: 150px;
+    width: 100%; 
+    max-width: 200px;
+    height: auto;
     object-fit: cover;
     border-radius: 4px;
+    flex-shrink: 0; /* 画像サイズを固定 */
 }
 
 .meal-info {

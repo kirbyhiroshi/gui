@@ -3,47 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カスタム未来カレンダー | 家計シミュレーション</title>
+    <title>未来カレンダー - カスタムシミュレーション</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <h1>未来カレンダー💰</h1>
-        
-        <div id="input-area">
-            <h2>初期設定</h2>
-            <div>
-                <label for="current-age">現在の年齢 (世帯主):</label>
-                <input type="number" id="current-age" value="35" min="20" max="100">
+    <div id="app-container">
+        <div id="control-panel">
+            <h1>未来カレンダー</h1>
+            <div class="settings">
+                <span>表示年数</span>
+                <input type="radio" name="display_years" value="35" checked><label>35年</label>
+                <input type="radio" name="display_years" value="50"><label>50年</label>
+                <input type="radio" name="display_years" value="65"><label>65年</label>
             </div>
-            <div>
-                <label for="initial-asset">初期資産 (万円):</label>
-                <input type="number" id="initial-asset" value="1000" min="0">
-            </div>
-            <div>
-                <label for="annual-income">年間手取り収入 (万円):</label>
-                <input type="number" id="annual-income" value="500" min="0">
-            </div>
-            <button id="run-simulation">シミュレーション実行</button>
+            <button onclick="openInputModal()">家族構成の入力</button>
         </div>
 
-        <div id="cashflow-area">
-            <h2>キャッシュフロー（未来カレンダー）</h2>
-            <div id="table-container">
-                <table id="cashflow-table">
+        <div id="cashFlowArea">
+            <div id="table-scroll-wrapper">
+                <table id="cashFlowTable" class="cashFlow table table-bordered">
                     <thead>
-                        <tr>
-                            <th>経過年数</th>
-                            <th>年齢</th>
-                            <th>収入</th>
-                            <th>支出</th>
-                            <th>年間収支</th>
-                            <th>資産残高</th>
-                        </tr>
+                        <tr class="head head1">
+                            <th colspan="2" class="fixed-column">経過年数</th>
+                            </tr>
+                        <tr class="head head2">
+                            <th colspan="2" class="fixed-column">西暦</th>
+                            </tr>
                     </thead>
-                    <tbody>
-                        </tbody>
+                    <tbody id="sortable-table">
+                        <tr class="data-row">
+                            <th colspan="2" class="fixed-column">年収(手取り)</th>
+                            </tr>
+                        <tr class="data-row">
+                            <th colspan="2" class="fixed-column">年間(実質)支出</th>
+                        </tr>
+                        <tr class="data-row">
+                            <th colspan="2" class="fixed-column">年間の貯蓄額</th>
+                        </tr>
+                        <tr class="data-row important-row">
+                            <th colspan="2" class="fixed-column">資産残高</th>
+                        </tr>
+                        <tr class="life-event-row">
+                            <th colspan="2" class="fixed-column">主なライフイベント</th>
+                        </tr>
+                    </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div id="simulation-options">
+            <h2>/ 未来シミュレーション /</h2>
+            <p>操作はカンタン、さまざまな未来をシミュレーションしてみよう。</p>
+            <div class="option-grid">
+                <div>住宅ローン</div>
+                <div>賃貸 or 購入</div>
+                <div>購入可能金額</div>
+                <div>今すぐ or 貯めてから</div>
             </div>
         </div>
     </div>

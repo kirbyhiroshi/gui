@@ -1,14 +1,15 @@
 // HTML要素を取得
 const getMealBtn = document.getElementById('get-meal-btn');
 const mealDisplay = document.getElementById('meal-display');
-// チェックボックスのNodeListを取得
-const checkboxes = document.querySelectorAll('input[name="cuisine"]');
+// ジャンル（地域）チェックボックス
+const areaCheckboxes = document.querySelectorAll('input[name="area"]');
+// 食材（カテゴリー）チェックボックス
+const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
 
 // TheMealDBのエンドポイント
-// 料理一覧を地域で絞り込むAPI
-const LIST_API_URL = 'https://www.themealdb.com/api/json/v1/1/filter.php?a=';
-// 料理の詳細情報をIDで取得するAPI
-const DETAIL_API_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=';
+const LIST_API_URL_AREA = 'https://www.themealdb.com/api/json/v1/1/filter.php?a='; // 地域検索
+const LIST_API_URL_CATEGORY = 'https://www.themealdb.com/api/json/v1/1/filter.php?c='; // カテゴリー検索
+const DETAIL_API_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i='; // 詳細検索
 
 
 /**
@@ -17,63 +18,73 @@ const DETAIL_API_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i=';
 async function getRandomMeal() {
     mealDisplay.innerHTML = '<p>献立を選んでいます...少々お待ちください⏳</p>';
 
-    // 1. 選択されたジャンル（地域）を取得
-    const selectedAreas = Array.from(checkboxes)
-        .filter(cb => cb.checked) // チェックされているもののみを抽出
-        .map(cb => cb.value);     // value（例: Japanese, Chinese）を取得
+    // 1. 選択されたジャンル（地域）とカテゴリーを取得
+    const selectedAreas = Array.from(areaCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+    const selectedCategories = Array.from(categoryCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.split(',')) // Beef,Chicken,Pork のようにカンマ区切りで結合された値を配列に戻す
+        .flat(); // 1次元の配列に平坦化
 
-    if (selectedAreas.length === 0) {
-        mealDisplay.innerHTML = '<p>献立のジャンルを1つ以上選択してください！</p>';
+    // 選択がない場合の処理（少なくともどちらか一方のグループが選択されている必要がある）
+    if (selectedAreas.length === 0 && selectedCategories.length === 0) {
+        mealDisplay.innerHTML = '<p>献立のジャンルまたは食材を1つ以上選択してください！</p>';
         return;
     }
 
     try {
-        // 2. 選択された地域ごとのデータ取得処理をまとめて実行
-        // Promise.allを使って全てのAPI呼び出しを並列で開始
-        const fetchPromises = selectedAreas.map(area => 
-            fetch(`${LIST_API_URL}${area}`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.warn(`地域: ${area} のデータ取得に失敗しました。`);
-                        return null; // 失敗時はnullを返す
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    console.error(`Fetchエラー（${area}）:`, error);
-                    return null; // 通信エラー時もnullを返す
-                })
-        );
+        // 2. 地域検索（ジャンル）
+        let areaMealIds = new Set();
+        if (selectedAreas.length > 0) {
+            const areaPromises = selectedAreas.map(area => fetch(`${LIST_API_URL_AREA}${area}`).then(r => r.json()).catch(() => ({ meals: [] })));
+            const areaResults = await Promise.all(areaPromises);
+            areaResults.forEach(data => {
+                if (data.meals) {
+                    data.meals.forEach(meal => areaMealIds.add(meal.idMeal));
+                }
+            });
+        }
+        
+        // 3. カテゴリー検索（食材）
+        let categoryMealIds = new Set();
+        if (selectedCategories.length > 0) {
+            const categoryPromises = selectedCategories.map(cat => fetch(`${LIST_API_URL_CATEGORY}${cat}`).then(r => r.json()).catch(() => ({ meals: [] })));
+            const categoryResults = await Promise.all(categoryPromises);
+            categoryResults.forEach(data => {
+                if (data.meals) {
+                    data.meals.forEach(meal => categoryMealIds.add(meal.idMeal));
+                }
+            });
+        }
+        
+        // 4. 最終的な絞り込み (AND検索)
+        let finalMealIds = [];
+        
+        // 地域とカテゴリーのどちらも選択されている場合、両方に含まれるIDのみ抽出（AND条件）
+        if (selectedAreas.length > 0 && selectedCategories.length > 0) {
+            areaMealIds.forEach(id => {
+                if (categoryMealIds.has(id)) {
+                    finalMealIds.push(id);
+                }
+            });
+        } 
+        // どちらか一方のみが選択されている場合、そのリストを使う
+        else if (selectedAreas.length > 0) {
+            finalMealIds = Array.from(areaMealIds);
+        } else if (selectedCategories.length > 0) {
+            finalMealIds = Array.from(categoryMealIds);
+        }
 
-        // 全てのレスポンスを待つ
-        const results = await Promise.all(fetchPromises);
-        
-        // 3. 取得した全料理リストからIDを抽出して一つの配列にまとめる
-        let mealIds = [];
-        
-        results.forEach(data => {
-            // データが正常に取得され、かつ料理リストが存在する場合のみ処理
-            if (data && data.meals && Array.isArray(data.meals)) {
-                const ids = data.meals.map(meal => meal.idMeal);
-                mealIds = mealIds.concat(ids);
-            }
-        });
-        
-        // 4. 料理が見つからなかった場合の処理
-        if (mealIds.length === 0) {
-            mealDisplay.innerHTML = '<p>選択されたジャンルに一致する料理が見つかりませんでした😔<br>別のジャンルを選択するか、すべてのチェックを外してランダムにしてください。</p>';
+        // 5. 料理が見つからなかった場合の処理
+        if (finalMealIds.length === 0) {
+            mealDisplay.innerHTML = '<p>選択されたジャンルと食材の組み合わせに一致する料理が見つかりませんでした😔</p>';
             return;
         }
 
-        // 5. 取得した全料理IDリストからランダムで一つ選択
-        const randomIndex = Math.floor(Math.random() * mealIds.length);
-        const randomMealId = mealIds[randomIndex];
+        // 6. ランダムにIDを選択し、詳細情報を取得
+        const randomIndex = Math.floor(Math.random() * finalMealIds.length);
+        const randomMealId = finalMealIds[randomIndex];
         
-        // 6. 選択した料理IDの詳細情報を取得
         const detailResponse = await fetch(`${DETAIL_API_URL}${randomMealId}`);
-        if (!detailResponse.ok) {
-            throw new Error(`料理の詳細情報取得に失敗しました。ステータス: ${detailResponse.status}`);
-        }
         const detailData = await detailResponse.json();
         const meal = detailData.meals[0];
 
@@ -92,8 +103,7 @@ async function getRandomMeal() {
 
 
 /**
- * 取得した料理の詳細を画面に描画する関数
- * (表示ロジックは変更なし)
+ * 取得した料理の詳細を画面に描画する関数 (変更なし)
  */
 function displayMeal(meal) {
     const mealName = meal.strMeal || '料理名不明';
@@ -116,5 +126,13 @@ function displayMeal(meal) {
 }
 
 
-// ボタンが押されたらgetRandomMeal関数を実行するように設定
-getMealBtn.addEventListener('click', getRandomMeal);
+// ボタンとイベントリスナーの設定
+if (getMealBtn) {
+    getMealBtn.addEventListener('click', getRandomMeal);
+    // 初期メッセージを設定
+    if (mealDisplay) {
+        mealDisplay.innerHTML = '<p>ジャンルと食材を選択して、ボタンを押してください。</p>';
+    }
+} else {
+    console.error("エラー: 'get-meal-btn' ボタン要素が見つかりませんでした。");
+}

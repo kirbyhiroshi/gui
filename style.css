@@ -1,4 +1,4 @@
-/* --- 以下のCSSを追加または確認 --- */
+/* 以前のCSSに以下の設定が不足していたら追記してください */
 
 .selection-area {
     margin-bottom: 25px;
@@ -22,21 +22,20 @@
     justify-content: space-around;
 }
 
+.checkbox-group.wide {
+    /* 食材選択（5つ）用。折り返しを許可し、間隔を調整 */
+    flex-wrap: wrap; 
+    gap: 10px;
+    justify-content: space-between; /* 均等に配置 */
+}
+
 .checkbox-group label {
     font-size: 16px;
     font-weight: bold;
     color: #555;
     cursor: pointer;
+    /* 食材選択で並びを調整 */
+    padding: 5px 0; 
 }
 
-.meal-card img {
-    /* (既存のCSS) 画像表示に関する部分 */
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-    margin-top: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* (その他、body, h1, buttonなどの既存CSSはそのまま利用) */
+/* その他のスタイル（.container, #get-meal-btn, #meal-displayなど）は以前のものを維持 */

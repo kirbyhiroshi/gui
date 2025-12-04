@@ -1,151 +1,50 @@
-// HTML要素を取得
-const display = document.getElementById('display');
-const buttons = document.querySelector('.buttons');
-
-// 計算の状態を管理するための変数
-let firstOperand = null; // 最初のオペランド（被演算子）
-let operator = null;     // 選択された演算子
-let waitingForSecondOperand = false; // 2番目のオペランド入力待ちかどうか
-
-// 画面に表示されている値を返す関数
-const getDisplayValue = () => display.value;
+// script.js
 
 /**
- * 数字（オペランド）を入力処理
- * @param {string} input - クリックされた数字
+ * 住宅ローンの月々の返済額と総支払額を計算する関数 (元利均等返済)
  */
-function inputDigit(input) {
-    if (waitingForSecondOperand === true) {
-        // 演算子が押された後なら、表示をリセットして2番目のオペランド入力を開始
-        display.value = input;
-        waitingForSecondOperand = false;
+function calculateLoan() {
+    // 1. HTMLから入力値を取得し、数値型に変換
+    // 借入額 (万円 -> 円)
+    const L_yen = parseFloat(document.getElementById('loanAmount').value) * 10000; 
+    const annualRate = parseFloat(document.getElementById('annualRate').value);
+    const years = parseInt(document.getElementById('years').value);
+
+    // 表示要素の取得
+    const monthlyElement = document.getElementById('monthlyPayment');
+    const totalElement = document.getElementById('totalPayment');
+
+    // 2. 入力値のバリデーション
+    if (isNaN(L_yen) || isNaN(annualRate) || isNaN(years) || L_yen <= 0 || annualRate < 0 || years <= 0) {
+        monthlyElement.textContent = 'エラー';
+        totalElement.textContent = 'エラー';
+        alert('借入額、年利、返済期間に適切な値を入力してください。');
+        return;
+    }
+
+    // 3. 計算に必要な要素を算出
+    const i = annualRate / 12 / 100; // 月利 (年利を12で割り、%を小数に変換)
+    const n = years * 12;            // 総返済回数 (期間(年) * 12)
+
+    let P; // 月々の返済額
+
+    // 4. 計算ロジックの実装（元利均等返済）
+    if (annualRate === 0) {
+        // 金利が0%の場合
+        P = L_yen / n;
     } else {
-        // 現在の値に追加
-        if (getDisplayValue() === '0' || getDisplayValue() === 'Error') {
-            display.value = input; // '0'や'Error'を新しい数字に置き換える
-        } else {
-            display.value = getDisplayValue() + input;
-        }
-    }
-}
-
-/**
- * 小数点処理
- */
-function inputDecimal() {
-    // 2番目のオペランド入力待ちなら、'0.'から開始
-    if (waitingForSecondOperand === true) {
-        display.value = '0.';
-        waitingForSecondOperand = false;
-        return;
+        // 元利均等返済の計算式: P = L * { i * (1 + i)^n / ((1 + i)^n - 1) }
+        // P = L \times \frac{i \times (1 + i)^n}{(1 + i)^n - 1}
+        const power_term = Math.pow(1 + i, n); // (1 + i)^n
+        P = L_yen * (i * power_term) / (power_term - 1);
     }
     
-    // 小数点がすでになければ追加
-    if (!getDisplayValue().includes('.')) {
-        display.value += '.';
-    }
+    // 5. 結果の算出と表示
+    // 月々の返済額は切り上げて整数にする
+    const monthlyPayment = Math.ceil(P); 
+    const totalPayment = monthlyPayment * n; // 総支払額
+
+    // toLocaleString() で3桁区切りのカンマを追加して表示
+    monthlyElement.textContent = monthlyPayment.toLocaleString();
+    totalElement.textContent = totalPayment.toLocaleString();
 }
-
-/**
- * 演算子処理
- * @param {string} nextOperator - クリックされた演算子
- */
-function handleOperator(nextOperator) {
-    const inputValue = parseFloat(getDisplayValue());
-
-    // 最初のオペランドがまだ設定されていない場合、現在の表示値を設定
-    if (firstOperand === null) {
-        firstOperand = inputValue;
-    } else if (operator && waitingForSecondOperand === false) {
-        // 2番目のオペランドが入力済みで、かつ演算子が設定されていれば計算を実行
-        const result = calculate(firstOperand, inputValue, operator);
-        display.value = String(result);
-        firstOperand = result; // 計算結果を次の最初のオペランドにする
-    }
-    
-    // 次のオペランド入力待ち状態に設定し、演算子を更新
-    waitingForSecondOperand = true;
-    operator = nextOperator;
-}
-
-/**
- * 計算を実行するコアロジック
- */
-function calculate(operand1, operand2, op) {
-    switch (op) {
-        case 'add':
-            return operand1 + operand2;
-        case 'subtract':
-            return operand1 - operand2;
-        case 'multiply':
-            return operand1 * operand2;
-        case 'divide':
-            if (operand2 === 0) {
-                return 'Error'; // ゼロ除算のエラー処理
-            }
-            return operand1 / operand2;
-        default:
-            return operand2; 
-    }
-}
-
-/**
- * 電卓の状態をリセット（ACボタン）
- */
-function resetCalculator() {
-    display.value = '0';
-    firstOperand = null;
-    operator = null;
-    waitingForSecondOperand = false;
-}
-
-// =======================================================
-// イベントリスナー：ボタンのクリックを監視
-// =======================================================
-
-buttons.addEventListener('click', (event) => {
-    // クリックされたのがボタンでなければ何もしない
-    if (!event.target.matches('.btn')) {
-        return;
-    }
-
-    const target = event.target;
-    const action = target.dataset.action; // data-action属性の値を取得
-    
-    // --- 数字・小数点の処理 ---
-    if (target.classList.contains('number')) {
-        if (target.textContent === '.') {
-            inputDecimal();
-        } else if (target.textContent !== '.') {
-            inputDigit(target.textContent);
-        }
-
-    // --- 演算子の処理 ---
-    } else if (target.classList.contains('operator')) {
-        handleOperator(action);
-
-    // --- イコールボタンの処理 ---
-    } else if (action === 'calculate') {
-        if (firstOperand !== null && operator !== null && waitingForSecondOperand === false) {
-            const inputValue = parseFloat(getDisplayValue());
-            const result = calculate(firstOperand, inputValue, operator);
-            
-            display.value = String(result);
-            
-            firstOperand = result;
-            operator = null; 
-            waitingForSecondOperand = true;
-
-            if (display.value === 'Error') {
-                resetCalculator();
-            }
-        }
-        
-    // --- クリアボタンの処理 ---
-    } else if (action === 'clear') {
-        resetCalculator();
-    }
-});
-
-// 初期化
-resetCalculator();

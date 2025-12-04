@@ -1,74 +1,93 @@
-/* 基本リセット */
+/* ベーススタイル */
 body {
     font-family: 'Noto Sans JP', sans-serif;
-    margin: 20px;
-    background-color: #f4f7f6;
+    margin: 0;
+    background-color: #f0f2f5;
 }
 
-#app {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+#app-container {
+    max-width: 1300px;
+    margin: 20px auto;
     background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
 }
 
-/* 入力エリアのスタイル */
-#input-area div {
-    margin-bottom: 10px;
+/* コントロールパネル (設定エリア) */
+#control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
 }
 
-#run-simulation {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+/* テーブル全体のラッパー（最も重要） */
+#table-scroll-wrapper {
+    overflow-x: auto; /* 横スクロールを有効にする */
     margin-top: 20px;
+    position: relative;
+    padding-left: 200px; /* 固定列の幅を確保 */
 }
 
-/* テーブルエリアのスタイル */
-#table-container {
-    overflow-x: auto; /* 横スクロールを可能にする */
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    white-space: nowrap; /* セルが改行されないようにする */
-}
-
-#cashflow-table {
+/* キャッシュフローテーブル */
+#cashFlowTable {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px; /* テーブルが一定の幅を持つようにする */
+    min-width: 2500px; /* 35年分の幅を確保 */
+    margin-left: -200px; /* 固定列の幅分を左にずらす */
 }
 
-#cashflow-table th, #cashflow-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: right;
-    width: 100px; /* 年数セルなどの幅を調整 */
+#cashFlowTable th, #cashFlowTable td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+    width: 50px; /* 年度の列幅を固定 */
+    box-sizing: border-box;
 }
 
-/* ヘッダーの固定 */
-#cashflow-table thead th {
-    background-color: #e9ecef;
-    position: sticky; /* ヘッダーを固定する */
-    top: 0;
+/* ⬅️ 左側固定列のスタイル（最も重要） */
+.fixed-column {
+    position: absolute; /* 相対位置から絶対位置に変更 */
+    left: 0;
+    top: auto;
+    width: 200px; /* 固定したい幅 */
+    text-align: left !important;
+    padding-left: 10px !important;
     z-index: 10;
+    background-color: #f8f8f8;
 }
 
-/* 経過年数や年齢の列を固定するための準備 (より複雑なJSが必要です) */
-#cashflow-table th:nth-child(1),
-#cashflow-table td:nth-child(1),
-#cashflow-table th:nth-child(2),
-#cashflow-table td:nth-child(2) {
-    /* 左側の列を固定する際には、JavaScriptと組み合わせて実装する必要があります */
-    text-align: left;
-    background-color: #f8f9fa;
+/* 固定列がヘッダーとデータのどの位置に来るかを調整 */
+#cashFlowTable thead th.fixed-column {
+    background-color: #e9ecef;
+}
+#cashFlowTable tbody th.fixed-column {
+    background-color: #f8f8f8;
 }
 
-.positive {
-    color: green;
+/* データセルは左側固定列の幅の分だけ右から始める */
+#cashFlowTable tbody td {
+    margin-left: 200px; /* この設定は複雑になるため、JavaScriptで制御が望ましい */
 }
-.negative {
-    color: red;
+
+
+/* シミュレーションオプション (画像下部) */
+#simulation-options {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.option-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.option-grid > div {
+    width: 20%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
 }

@@ -59,6 +59,7 @@ h2 {
     transition: background-color 0.2s;
 }
 
+/* CSSの隣接セレクタを使って、チェックされたinputの直後のlabelにスタイルを適用 */
 .checkbox-group input[type="checkbox"]:checked + label {
     background-color: #007bff;
     color: white;
@@ -66,7 +67,7 @@ h2 {
 }
 
 .checkbox-group input[type="checkbox"] {
-    /* チェックボックス自体を非表示にして、ラベルをクリックさせる */
+    /* チェックボックス自体を非表示にする */
     display: none;
 }
 
@@ -94,7 +95,7 @@ h2 {
     border: 1px solid #e9ecef;
     padding: 20px;
     border-radius: 8px;
-    min-height: 150px; /* 結果表示エリアの最低高さを確保 */
+    min-height: 150px;
 }
 
 .meal-card {
@@ -103,7 +104,7 @@ h2 {
     margin-bottom: 10px;
     border-radius: 6px;
     display: flex;
-    flex-direction: column; /* 画面が狭い場合は縦並び */
+    flex-direction: column;
     gap: 20px;
     align-items: flex-start;
     background-color: #ffffff;
@@ -111,7 +112,7 @@ h2 {
 
 @media (min-width: 600px) {
     .meal-card {
-        flex-direction: row; /* 画面が広い場合は横並び */
+        flex-direction: row;
         align-items: center;
     }
 }
@@ -122,7 +123,7 @@ h2 {
     height: auto;
     object-fit: cover;
     border-radius: 4px;
-    flex-shrink: 0; /* 画像サイズを固定 */
+    flex-shrink: 0;
 }
 
 .meal-info {

@@ -1,98 +1,81 @@
-/* 基本的なリセット */
+/* style.css */
+
 body {
-    font-family: Arial, sans-serif;
-    display: flex; /* 中央寄せのためにFlexboxを使用 */
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
     margin: 0;
-    background-color: #f4f4f4;
-}
-
-/* 電卓本体のコンテナ */
-.calculator {
-    background-color: #333;
     padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-    width: 300px; /* 電卓の幅を設定 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 結果表示画面 */
-.display {
-    width: 100%;
-    margin-bottom: 20px;
+h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input[type="number"] {
+    width: 95%;
     padding: 10px;
-    font-size: 2em;
-    text-align: right;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    background-color: #222;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
     color: white;
-    box-sizing: border-box; /* paddingを含めて幅100%になるように調整 */
-}
-
-/* ボタン群のコンテナ */
-.buttons {
-    display: grid;
-    /* 1:1:1:1の4列グリッドを作成 */
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px; /* ボタン間のスペース */
-}
-
-/* すべてのボタンの共通スタイル */
-.btn {
-    padding: 20px 0;
-    font-size: 1.2em;
     border: none;
     border-radius: 5px;
+    font-size: 18px;
     cursor: pointer;
-    transition: background-color 0.1s;
+    margin-top: 20px;
+    transition: background-color 0.3s;
 }
 
-/* 数字とドットボタン */
-.btn.number, .btn.decimal {
-    background-color: #666;
-    color: white;
-}
-.btn.number:hover, .btn.decimal:hover {
-    background-color: #888;
+button:hover {
+    background-color: #218838;
 }
 
-/* 演算子ボタン */
-.btn.operator {
-    background-color: #f9a602;
-    color: white;
-}
-.btn.operator:hover {
-    background-color: #ffb732;
-}
-
-/* クリアボタン (AC) */
-.btn.clear {
-    background-color: #d9534f;
-    color: white;
-    /* ACボタンを3列分に広げる */
-    grid-column: span 3;
-}
-.btn.clear:hover {
-    background-color: #e56763;
+.result-box {
+    background-color: #e9f7ef;
+    border: 1px solid #28a745;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 30px;
 }
 
-/* イコールボタン */
-.btn.equal {
-    background-color: #5cb85c;
-    color: white;
-    /* イコールボタンを2行分に広げる */
-    grid-row: span 2;
-}
-.btn.equal:hover {
-    background-color: #6cc66c;
+.result-box h3 {
+    margin-top: 0;
+    color: #28a745;
+    font-size: 20px;
 }
 
-/* 0ボタンを2列分に広げる */
-.btn.zero {
-    grid-column: span 2;
-    text-align: left;
-    padding-left: 30px;
+.result-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #007bff;
 }

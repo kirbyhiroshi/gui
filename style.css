@@ -1,93 +1,91 @@
-/* ベーススタイル */
 body {
     font-family: 'Noto Sans JP', sans-serif;
-    margin: 0;
-    background-color: #f0f2f5;
-}
-
-#app-container {
-    max-width: 1300px;
-    margin: 20px auto;
-    background-color: white;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    background-color: #f4f7f6;
     padding: 20px;
 }
 
-/* コントロールパネル (設定エリア) */
-#control-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #ddd;
+#simulator-container {
+    max-width: 650px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* テーブル全体のラッパー（最も重要） */
-#table-scroll-wrapper {
-    overflow-x: auto; /* 横スクロールを有効にする */
+h1 {
+    text-align: center;
+    color: #007bff;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #333;
+    margin-top: 25px;
+    border-left: 5px solid #007bff;
+    padding-left: 10px;
+}
+
+/* フォームのスタイル */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.input-group input[type="number"], .input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* paddingを含めたサイズ指定 */
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background-color: #28a745; /* グリーン系の実行ボタン */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
     margin-top: 20px;
-    position: relative;
-    padding-left: 200px; /* 固定列の幅を確保 */
+    transition: background-color 0.3s;
 }
 
-/* キャッシュフローテーブル */
-#cashFlowTable {
+button:hover {
+    background-color: #1e7e34;
+}
+
+/* 結果テーブルのスタイル */
+#results table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 2500px; /* 35年分の幅を確保 */
-    margin-left: -200px; /* 固定列の幅分を左にずらす */
+    margin-top: 15px;
 }
 
-#cashFlowTable th, #cashFlowTable td {
-    border: 1px solid #ccc;
-    padding: 5px;
-    text-align: center;
-    width: 50px; /* 年度の列幅を固定 */
-    box-sizing: border-box;
+#results th, #results td {
+    border: 1px solid #eee;
+    padding: 12px;
+    text-align: left;
 }
 
-/* ⬅️ 左側固定列のスタイル（最も重要） */
-.fixed-column {
-    position: absolute; /* 相対位置から絶対位置に変更 */
-    left: 0;
-    top: auto;
-    width: 200px; /* 固定したい幅 */
-    text-align: left !important;
-    padding-left: 10px !important;
-    z-index: 10;
+#results th {
     background-color: #f8f8f8;
+    width: 60%;
 }
 
-/* 固定列がヘッダーとデータのどの位置に来るかを調整 */
-#cashFlowTable thead th.fixed-column {
-    background-color: #e9ecef;
-}
-#cashFlowTable tbody th.fixed-column {
-    background-color: #f8f8f8;
-}
-
-/* データセルは左側固定列の幅の分だけ右から始める */
-#cashFlowTable tbody td {
-    margin-left: 200px; /* この設定は複雑になるため、JavaScriptで制御が望ましい */
-}
-
-
-/* シミュレーションオプション (画像下部) */
-#simulation-options {
-    text-align: center;
-    padding-top: 40px;
-}
-
-.option-grid {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-.option-grid > div {
-    width: 20%;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    cursor: pointer;
+/* 合計行の強調 */
+#results tr.total th, #results tr.total td {
+    background-color: #fff3cd; /* 薄い黄色で強調 */
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #856404;
 }

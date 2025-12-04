@@ -3,38 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>シンプルな電卓</title>
-    <link rel="stylesheet" href="style.css">
+    <title>住宅ローン返済額計算機</title>
+    <style>
+        /* --- CSS スタイル --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input[type="number"] {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result-box {
+            background-color: #e9f7ef;
+            border: 1px solid #28a745;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+
+        .result-box h3 {
+            margin-top: 0;
+            color: #28a745;
+            font-size: 20px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
 </head>
 <body>
-    <div class="calculator">
-        <input type="text" class="display" id="display" disabled value="0">
-        
-        <div class="buttons">
-            <button class="btn clear" data-action="clear">AC</button>
-            <button class="btn operator" data-action="divide">/</button>
-            <button class="btn operator" data-action="multiply">*</button>
-            
-            <button class="btn number">7</button>
-            <button class="btn number">8</button>
-            <button class="btn number">9</button>
-            <button class="btn operator" data-action="subtract">-</button>
-            
-            <button class="btn number">4</button>
-            <button class="btn number">5</button>
-            <button class="btn number">6</button>
-            <button class="btn operator" data-action="add">+</button>
-            
-            <button class="btn number">1</button>
-            <button class="btn number">2</button>
-            <button class="btn number">3</button>
-            
-            <button class="btn number zero">0</button>
-            <button class="btn number decimal" data-action="decimal">.</button>
-            <button class="btn equal" data-action="calculate">=</button>
+
+    <div class="container">
+        <h1>🏠 住宅ローン計算機 (元利均等返済)</h1>
+
+        <div class="input-group">
+            <label for="loanAmount">借入額（万円）</label>
+            <input type="number" id="loanAmount" value="3000" min="100">
         </div>
+
+        <div class="input-group">
+            <label for="annualRate">年利（%）</label>
+            <input type="number" id="annualRate" step="0.01" value="1.2" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="years">返済期間（年）</label>
+            <input type="number" id="years" value="35" min="1">
+        </div>
+
+        <button onclick="calculateLoan()">計算する</button>
+
+        <div class="result-box">
+            <h3>月々の返済額:</h3>
+            <span id="monthlyPayment" class="result-value">---</span> 円
+        </div>
+        
+        <div class="result-box" style="margin-top: 15px;">
+            <h3>総支払額（元金＋利息）:</h3>
+            <span id="totalPayment" class="result-value">---</span> 円
+        </div>
+
     </div>
-    
-    <script src="script.js"></script>
+
+    <script>
+        /* --- JavaScript ロジック --- */
+        function calculateLoan() {
+            // 1. HTMLから入力値を取得し、数値型に変換
+            // 借入額 (万円 -> 円)
+            const L_yen = parseFloat(document.getElementById('loanAmount').value) * 10000; 
+            const annualRate = parseFloat(document.getElementById('annualRate').value);
+            const years = parseInt(document.getElementById('years').value);
+
+            // 表示要素の取得
+            const monthlyElement = document.getElementById('monthlyPayment');
+            const totalElement = document.getElementById('totalPayment');
+
+            // 2. 入力値のバリデーション
+            if (isNaN(L_yen) || isNaN(annualRate) || isNaN(years) || L_yen <= 0 || annualRate < 0 || years <= 0) {
+                monthlyElement.textContent = 'エラー';
+                totalElement.textContent = 'エラー';
+                alert('借入額、年利、返済期間に適切な値を入力してください。');
+                return;
+            }
+
+            // 3. 計算に必要な要素を算出
+            const i = annualRate / 12 / 100; // 月利 (年利を12で割り、%を小数に変換)
+            const n = years * 12;            // 総返済回数 (期間(年) * 12)
+
+            let P; // 月々の返済額
+
+            // 4. 計算ロジックの実装（元利均等返済）
+            if (annualRate === 0) {
+                // 金利が0%の場合
+                P = L_yen / n;
+            } else {
+                // 元利均等返済の計算式: P = L * { i * (1 + i)^n / ((1 + i)^n - 1) }
+                const power_term = Math.pow(1 + i, n); // (1 + i)^n
+                P = L_yen * (i * power_term) / (power_term - 1);
+            }
+            
+            // 5. 結果の算出と表示
+            // 月々の返済額は切り上げて整数にする
+            const monthlyPayment = Math.ceil(P); 
+            const totalPayment = monthlyPayment * n; // 総支払額
+
+            // toLocaleString() で3桁区切りのカンマを追加して表示
+            monthlyElement.textContent = monthlyPayment.toLocaleString();
+            totalElement.textContent = totalPayment.toLocaleString();
+        }
+    </script>
 </body>
 </html>

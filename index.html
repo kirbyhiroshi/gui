@@ -3,63 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>未来カレンダー - カスタムシミュレーション</title>
+    <title>住宅ローン控除シミュレーター</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app-container">
-        <div id="control-panel">
-            <h1>未来カレンダー</h1>
-            <div class="settings">
-                <span>表示年数</span>
-                <input type="radio" name="display_years" value="35" checked><label>35年</label>
-                <input type="radio" name="display_years" value="50"><label>50年</label>
-                <input type="radio" name="display_years" value="65"><label>65年</label>
+    <div id="simulator-container">
+        <h1>住宅ローン控除 年間控除額シミュレーター</h1>
+        
+        <div id="input-form">
+            <h2>🏠 控除の基礎情報入力</h2>
+
+            <div class="input-group">
+                <label for="loan-balance">年末ローン残高 (万円)</label>
+                <input type="number" id="loan-balance" value="3000" min="0">
             </div>
-            <button onclick="openInputModal()">家族構成の入力</button>
+
+            <div class="input-group">
+                <label for="income-tax">年間の源泉徴収税額 (所得税) (円)</label>
+                <input type="number" id="income-tax" value="200000" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="resident-taxable-income">住民税の課税所得金額 (円)</label>
+                <input type="number" id="resident-taxable-income" value="3000000" min="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="residence-type">住宅の種別 (最大借入限度額)</label>
+                <select id="residence-type">
+                    <option value="5000">長期優良住宅・低炭素住宅 (5,000万円)</option>
+                    <option value="4500">ZEH水準省エネ住宅 (4,500万円)</option>
+                    <option value="4000">省エネ基準適合住宅 (4,000万円)</option>
+                    <option value="3000">その他の一般住宅 (3,000万円)</option>
+                </select>
+            </div>
+
+            <button onclick="calculateDeduction()">シミュレーション実行</button>
         </div>
 
-        <div id="cashFlowArea">
-            <div id="table-scroll-wrapper">
-                <table id="cashFlowTable" class="cashFlow table table-bordered">
-                    <thead>
-                        <tr class="head head1">
-                            <th colspan="2" class="fixed-column">経過年数</th>
-                            </tr>
-                        <tr class="head head2">
-                            <th colspan="2" class="fixed-column">西暦</th>
-                            </tr>
-                    </thead>
-                    <tbody id="sortable-table">
-                        <tr class="data-row">
-                            <th colspan="2" class="fixed-column">年収(手取り)</th>
-                            </tr>
-                        <tr class="data-row">
-                            <th colspan="2" class="fixed-column">年間(実質)支出</th>
-                        </tr>
-                        <tr class="data-row">
-                            <th colspan="2" class="fixed-column">年間の貯蓄額</th>
-                        </tr>
-                        <tr class="data-row important-row">
-                            <th colspan="2" class="fixed-column">資産残高</th>
-                        </tr>
-                        <tr class="life-event-row">
-                            <th colspan="2" class="fixed-column">主なライフイベント</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="simulation-options">
-            <h2>/ 未来シミュレーション /</h2>
-            <p>操作はカンタン、さまざまな未来をシミュレーションしてみよう。</p>
-            <div class="option-grid">
-                <div>住宅ローン</div>
-                <div>賃貸 or 購入</div>
-                <div>購入可能金額</div>
-                <div>今すぐ or 貯めてから</div>
-            </div>
+        <div id="results">
+            <h2>✅ 計算結果 (年間)</h2>
+            <p>※控除期間1年目の試算です。</p>
+            <table>
+                <tr>
+                    <th>控除対象限度額 (万円)</th>
+                    <td id="limit-display"></td>
+                </tr>
+                <tr>
+                    <th>基本控除額 (0.7%)</th>
+                    <td id="basic-deduction"></td>
+                </tr>
+                <tr>
+                    <th>所得税からの控除額</th>
+                    <td id="income-tax-deduction"></td>
+                </tr>
+                <tr>
+                    <th>住民税からの控除額</th>
+                    <td id="resident-tax-deduction"></td>
+                </tr>
+                <tr class="total">
+                    <th>年間総控除額 (合計)</th>
+                    <td id="total-deduction"></td>
+                </tr>
+            </table>
         </div>
     </div>
     

@@ -1,41 +1,69 @@
-/* 以前のCSSに以下の設定が不足していたら追記してください */
-
-.selection-area {
-    margin-bottom: 25px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-.selection-area h2 {
-    font-size: 18px;
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
     color: #333;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
-}
-
-.checkbox-group {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
 }
 
-.checkbox-group.wide {
-    /* 食材選択（5つ）用。折り返しを許可し、間隔を調整 */
-    flex-wrap: wrap; 
-    gap: 10px;
-    justify-content: space-between; /* 均等に配置 */
+.container {
+    text-align: center;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 90%;
 }
 
-.checkbox-group label {
-    font-size: 16px;
-    font-weight: bold;
-    color: #555;
+h1 {
+    color: #4CAF50;
+    margin-bottom: 30px;
+}
+
+#get-meal-btn {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #FF9800; /* 目立つオレンジ色 */
+    color: white;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    /* 食材選択で並びを調整 */
-    padding: 5px 0; 
+    transition: background-color 0.3s ease;
+    margin-bottom: 30px;
 }
 
-/* その他のスタイル（.container, #get-meal-btn, #meal-displayなど）は以前のものを維持 */
+#get-meal-btn:hover {
+    background-color: #f57c00;
+}
+
+.meal-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fffaf2;
+    text-align: left;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.meal-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.meal-card h2 {
+    color: #4CAF50;
+    margin-top: 0;
+    margin-bottom: 10px;
+}

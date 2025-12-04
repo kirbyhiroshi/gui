@@ -1,25 +1,15 @@
 /* --- 以下のCSSを追加または確認 --- */
 
-.selection-area {
-    margin-bottom: 25px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-.selection-area h2 {
-    font-size: 18px;
-    color: #333;
-    margin-top: 0;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 5px;
-}
-
 .checkbox-group {
     display: flex;
     justify-content: space-around;
+    /* ジャンル選択（和洋中）用 */
+}
+
+.checkbox-group.wide {
+    /* 食材選択（5つ）用。折り返しを許可 */
+    flex-wrap: wrap; 
+    gap: 10px;
 }
 
 .checkbox-group label {
@@ -27,16 +17,6 @@
     font-weight: bold;
     color: #555;
     cursor: pointer;
+    /* 食材選択で並びを調整 */
+    padding: 5px 10px; 
 }
-
-.meal-card img {
-    /* (既存のCSS) 画像表示に関する部分 */
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-    margin-top: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* (その他、body, h1, buttonなどの既存CSSはそのまま利用) */

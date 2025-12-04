@@ -2,6 +2,8 @@
 
 /**
  * 住宅ローンの月々の返済額と総支払額を計算する関数 (元利均等返済)
+ * 計算式: 
+ * 毎月の返済額 = 借入金額 × 月利 × (1 + 月利)^返済回数 / ((1 + 月利)^返済回数 - 1)
  */
 function calculateLoan() {
     // 1. HTMLから入力値を取得し、数値型に変換
@@ -23,20 +25,24 @@ function calculateLoan() {
     }
 
     // 3. 計算に必要な要素を算出
-    const i = annualRate / 12 / 100; // 月利 (年利を12で割り、%を小数に変換)
-    const n = years * 12;            // 総返済回数 (期間(年) * 12)
+    const i = annualRate / 12 / 100; // 月利 (i)
+    const n = years * 12;            // 総返済回数 (n)
 
-    let P; // 月々の返済額
+    let P; // 月々の返済額 (P)
 
     // 4. 計算ロジックの実装（元利均等返済）
     if (annualRate === 0) {
         // 金利が0%の場合
         P = L_yen / n;
     } else {
-        // 元利均等返済の計算式: P = L * { i * (1 + i)^n / ((1 + i)^n - 1) }
-        // P = L \times \frac{i \times (1 + i)^n}{(1 + i)^n - 1}
-        const power_term = Math.pow(1 + i, n); // (1 + i)^n
-        P = L_yen * (i * power_term) / (power_term - 1);
+        // (1 + 月利)^返済回数 の部分を計算
+        const power_term = Math.pow(1 + i, n); 
+        
+        // P = L × i × (1 + i)^n / ((1 + i)^n - 1)
+        const numerator = i * power_term;       // 分子: 月利 × (1 + 月利)^返済回数
+        const denominator = power_term - 1;     // 分母: (1 + 月利)^返済回数 - 1
+        
+        P = L_yen * (numerator / denominator);
     }
     
     // 5. 結果の算出と表示

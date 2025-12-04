@@ -1,30 +1,74 @@
-/* style.css (差分のみ記載) */
-
-/* 既存のスタイル... */
-
-/* 新規追加・修正 */
-h2 {
-    color: #009688; /* グリーン系の色に変更 */
-    text-align: center;
-    margin: 20px 0 10px;
+/* 基本リセット */
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    margin: 20px;
+    background-color: #f4f7f6;
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background: #e0e0e0;
-    margin: 20px 0;
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 繰り上げ返済による削減効果のスタイル */
-#prepaymentSavings {
-    font-size: 16px;
-    font-weight: bold;
-    color: #009688;
-    background-color: #e0f2f1;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #009688;
+/* 入力エリアのスタイル */
+#input-area div {
+    margin-bottom: 10px;
 }
 
-/* 既存のスタイル... */
+#run-simulation {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+/* テーブルエリアのスタイル */
+#table-container {
+    overflow-x: auto; /* 横スクロールを可能にする */
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    white-space: nowrap; /* セルが改行されないようにする */
+}
+
+#cashflow-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* テーブルが一定の幅を持つようにする */
+}
+
+#cashflow-table th, #cashflow-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: right;
+    width: 100px; /* 年数セルなどの幅を調整 */
+}
+
+/* ヘッダーの固定 */
+#cashflow-table thead th {
+    background-color: #e9ecef;
+    position: sticky; /* ヘッダーを固定する */
+    top: 0;
+    z-index: 10;
+}
+
+/* 経過年数や年齢の列を固定するための準備 (より複雑なJSが必要です) */
+#cashflow-table th:nth-child(1),
+#cashflow-table td:nth-child(1),
+#cashflow-table th:nth-child(2),
+#cashflow-table td:nth-child(2) {
+    /* 左側の列を固定する際には、JavaScriptと組み合わせて実装する必要があります */
+    text-align: left;
+    background-color: #f8f9fa;
+}
+
+.positive {
+    color: green;
+}
+.negative {
+    color: red;
+}

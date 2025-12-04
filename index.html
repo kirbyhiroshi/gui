@@ -7,15 +7,47 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>今日の献立は何にする？🤔</h1>
-        
-        <button id="get-meal-btn">献立を決める！</button>
 
-        <div id="meal-display" class="meal-card">
-            <p>ボタンを押して、今日の献立を決めましょう！</p>
-        </div>
-    </div>
+    <header>
+        <h1>🍽️ 献立ランダムメーカー</h1>
+    </header>
+
+    <main>
+        <section class="selection-box">
+            <h2>🌍 ジャンル選択</h2>
+            <div class="checkbox-group" id="category-group">
+                <label><input type="checkbox" name="category" value="Japanese"> 和食 (Japanese)</label>
+                <label><input type="checkbox" name="category" value="Chinese"> 中華 (Chinese)</label>
+                <label><input type="checkbox" name="category" value="French"> 洋食 (French)</label>
+                <label><input type="checkbox" name="category" value="Italian"> 洋食 (Italian)</label>
+                </div>
+        </section>
+
+        <section class="selection-box">
+            <h2>🥩 食材/タイプ選択</h2>
+            <div class="checkbox-group" id="ingredient-group">
+                <label><input type="checkbox" name="ingredient" value="Beef"> 肉 (Beef/牛)</label>
+                <label><input type="checkbox" name="ingredient" value="Chicken"> 肉 (Chicken/鶏)</label>
+                <label><input type="checkbox" name="ingredient" value="Salmon"> 魚 (Salmon/鮭)</label>
+                <label><input type="checkbox" name="ingredient" value="Tuna"> 魚 (Tuna/マグロ)</label>
+                <label><input type="checkbox" name="ingredient" value="Noodles"> 麺 (Noodles)</label>
+                <label><input type="checkbox" name="ingredient" value="Dessert"> デザート (Dessert)</label>
+            </div>
+        </section>
+
+        <button id="decide-button">献立をきめる！</button>
+
+        <section id="result-area">
+            <h2>💡 今日の献立</h2>
+            <div id="meal-display">
+                <p>選択肢を選んで「献立をきめる！」ボタンを押してください。</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Powered by TheMealDB</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

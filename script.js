@@ -1,63 +1,71 @@
-// script.js (以前提供したコード)
+// HTML要素を取得
+const getMealBtn = document.getElementById('get-meal-btn');
+const mealDisplay = document.getElementById('meal-display');
 
-// 金額をカンマ区切りと単位付きの文字列に変換するヘルパー関数
-function formatMoney(amount, unit = '円') {
-    return amount.toLocaleString() + ' ' + unit;
-}
+// TheMealDBのランダム取得エンドポイント
+const API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php';
 
-function calculateDeduction() {
-    // 1. 入力値の取得と単位の調整
-    const loanBalanceMan = parseFloat(document.getElementById('loan-balance').value);
-    const loanBalanceYen = loanBalanceMan * 10000; 
-    
-    const incomeTaxYen = parseFloat(document.getElementById('income-tax').value);
-    const residentTaxableIncomeYen = parseFloat(document.getElementById('resident-taxable-income').value);
-    
-    // 控除限度額は「万円」の値を取得
-    const limitMan = parseFloat(document.getElementById('residence-type').value);
-    const limitYen = limitMan * 10000;
+/**
+ * 献立をランダムで取得し、画面に表示する関数
+ */
+async function getRandomMeal() {
+    // 読み込み中であることをユーザーに伝える
+    mealDisplay.innerHTML = '<p>献立を選んでいます...少々お待ちください⏳</p>';
 
-    // 入力チェック
-    if (isNaN(loanBalanceMan) || isNaN(incomeTaxYen) || isNaN(residentTaxableIncomeYen)) {
-        alert("すべての項目に数値を入力してください。");
-        return;
-    }
-
-    // --- ステップ 1: 控除対象残高の決定 ---
-    const deductionTargetBalanceYen = Math.min(loanBalanceYen, limitYen);
-    
-    // --- ステップ 2: 基本控除額の算出 (0.7%) ---
-    const basicDeductionYen = Math.floor(deductionTargetBalanceYen * 0.007);
-
-    // --- ステップ 3: 所得税からの控除額決定 ---
-    const incomeTaxDeductionYen = Math.min(basicDeductionYen, incomeTaxYen);
-
-    // --- ステップ 4: 住民税からの控除額決定 ---
-    const deductionRemainder = basicDeductionYen - incomeTaxDeductionYen;
-    let residentTaxDeductionYen = 0;
-
-    if (deductionRemainder > 0) {
-        // 住民税からの控除上限 (課税所得の5% または 97,500円の小さい方)
-        const residentTaxLimitA = residentTaxableIncomeYen * 0.05;
-        const residentTaxLimitB = 97500;
-        const residentTaxCeiling = Math.min(residentTaxLimitA, residentTaxLimitB);
-
-        // 控除残額と住民税控除上限の小さい方が、住民税から控除される額
-        residentTaxDeductionYen = Math.min(deductionRemainder, residentTaxCeiling);
+    try {
+        // 1. APIからデータを取得
+        const response = await fetch(API_URL);
         
-        residentTaxDeductionYen = Math.floor(residentTaxDeductionYen);
-    }
-    
-    // --- ステップ 5: 年間の総控除額算出 ---
-    const totalDeductionYen = incomeTaxDeductionYen + residentTaxDeductionYen;
+        // ネットワークエラーなどをチェック
+        if (!response.ok) {
+            throw new Error(`HTTPエラー！ステータス: ${response.status}`);
+        }
+        
+        const data = await response.json();
 
-    // 4. 結果の表示（HTMLの更新）
-    document.getElementById('limit-display').textContent = formatMoney(limitMan, '万円');
-    document.getElementById('basic-deduction').textContent = formatMoney(basicDeductionYen);
-    document.getElementById('income-tax-deduction').textContent = formatMoney(incomeTaxDeductionYen);
-    document.getElementById('resident-tax-deduction').textContent = formatMoney(residentTaxDeductionYen);
-    document.getElementById('total-deduction').textContent = formatMoney(totalDeductionYen);
+        // 2. 取得したデータから料理情報を抽出
+        // TheMealDBは 'meals'という配列の中に料理データを持っています。
+        const meal = data.meals[0];
+
+        // 3. HTMLに料理情報を表示
+        if (meal) {
+            displayMeal(meal);
+        } else {
+            // データが取得できなかった場合の表示
+            mealDisplay.innerHTML = '<p>ごめんなさい、料理を見つけられませんでした😔</p>';
+        }
+
+    } catch (error) {
+        console.error('献立の取得中にエラーが発生しました:', error);
+        // エラーメッセージを画面に表示
+        mealDisplay.innerHTML = `<p>エラーが発生しました: ${error.message}</p><p>インターネット接続やAPIの状況を確認してください。</p>`;
+    }
 }
 
-// 初期表示のために一度実行
-window.onload = calculateDeduction;
+/**
+ * 取得した料理の詳細を画面に描画する関数
+ * @param {Object} meal - 取得した料理オブジェクト
+ */
+function displayMeal(meal) {
+    // 表示するHTMLコンテンツを作成
+    const mealHtml = `
+        <h2>${meal.strMeal}</h2>
+        <p>カテゴリー: <strong>${meal.strCategory || '不明'}</strong></p>
+        <p>地域: <strong>${meal.strArea || '不明'}</strong></p>
+        ${meal.strMealThumb ? `<img src="${meal.strMealThumb}" alt="${meal.strMeal}の画像">` : ''}
+        <p>作り方の簡単なヒント: ${meal.strInstructions ? meal.strInstructions.substring(0, 150) + '...' : '情報なし'}</p>
+        ${meal.strSource ? `<p><a href="${meal.strSource}" target="_blank">レシピの詳細を見る 🔗</a></p>` : ''}
+    `;
+    
+    // 作成したHTMLを画面に反映
+    mealDisplay.innerHTML = mealHtml;
+}
+
+
+// 5. ボタンが押されたらgetRandomMeal関数を実行するように設定
+getMealBtn.addEventListener('click', getRandomMeal);
+
+// ページ読み込み時に一度だけ実行して初期メッセージを表示
+document.addEventListener('DOMContentLoaded', () => {
+    mealDisplay.innerHTML = '<p>ボタンを押して、今日の献立を決めましょう！</p>';
+});

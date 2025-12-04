@@ -1,82 +1,61 @@
-// script.js
+document.getElementById('run-simulation').addEventListener('click', runSimulation);
 
-// === 共通ヘルパー関数 ===
+function runSimulation() {
+    // 1. 入力値の取得
+    const startAge = parseInt(document.getElementById('current-age').value);
+    const initialAsset = parseFloat(document.getElementById('initial-asset').value) * 10000; // 万円を円に
+    const annualIncome = parseFloat(document.getElementById('annual-income').value) * 10000; // 万円を円に
 
-/**
- * 元利均等返済後の残高を算出する関数 (元金残高計算式)
- * @param {number} L - 借入元金
- * @param {number} i - 月利
- * @param {number} n - 総返済回数
- * @param {number} k - 返済後の残高を求めたい回数 (k回)
- * @param {number} P - 毎月の返済額
- * @returns {number} 残高
- */
-function calculateRemainingBalance(L, i, n, k, P) {
-    if (i === 0) {
-        return L - L * (k / n); // 金利0%の場合
-    }
-    
-    // k回返済後の残高 = L * (1+i)^k - P * (((1+i)^k) - 1) / i
-    const power_term_k = Math.pow(1 + i, k);
-    const remaining = L * power_term_k - P * (power_term_k - 1) / i;
-    return remaining > 0 ? remaining : 0;
-}
+    // 簡略化された固定パラメータ
+    const endAge = 80; // シミュレーション終了年齢
+    const retirementAge = 65; // 退職年齢
+    const averageExpense = 400 * 10000; // 簡略化のため年間平均支出を固定（400万円）
+    const pension = 250 * 10000; // 簡略化のため年金収入を固定（250万円）
 
-/**
- * 毎月の返済額 (P) を求める関数 (元利均等返済の基本公式)
- */
-function calculateMonthlyPayment(L, i, n) {
-    if (i === 0) {
-        return L / n;
-    }
-    const power_term = Math.pow(1 + i, n); 
-    const numerator = i * power_term;
-    const denominator = power_term - 1;
-    return L * (numerator / denominator);
-}
+    let currentAsset = initialAsset;
+    const tableBody = document.querySelector('#cashflow-table tbody');
+    tableBody.innerHTML = ''; // 既存のデータをクリア
 
-// === 元利均等返済ロジック ===
+    // 2. シミュレーションループ（1年ごとに計算）
+    for (let year = 1; ; year++) {
+        const currentAge = startAge + year - 1;
+        if (currentAge > endAge) break;
 
-function calculateGenriKinto(L_yen, i, n, prepaymentAmount, prepaymentYear) {
-    
-    // 繰り上げ返済前の月々の返済額を計算
-    const P_monthly_original = calculateMonthlyPayment(L_yen, i, n);
-    const monthlyPaymentOriginal = Math.ceil(P_monthly_original);
-    const totalPaymentOriginal = monthlyPaymentOriginal * n;
+        // 収入の計算
+        let income = (currentAge < retirementAge) ? annualIncome : pension;
 
-    let totalPayment = totalPaymentOriginal;
-    let savings = 0;
-    let newN = n;
-    let note = '';
-
-    // 繰り上げ返済が設定されている場合
-    if (prepaymentAmount > 0 && prepaymentYear > 0 && prepaymentYear * 12 < n) {
-        const k = prepaymentYear * 12; // 繰り上げ返済時点での支払回数
-
-        // 1. 繰り上げ返済時点の残高を計算
-        let remainingBalance = calculateRemainingBalance(L_yen, i, n, k, P_monthly_original);
-
-        // 2. 繰り上げ返済を適用
-        remainingBalance -= prepaymentAmount;
-
-        // 3. 繰り上げ返済後の新しい返済回数 (n') を算出
-        // (1+i)^n' = P / (P - L' * i)
+        // 支出の計算 (簡略化のため、年間支出を固定)
+        let expense = averageExpense;
         
-        if (remainingBalance > 0) {
-            // 繰り上げ返済後の新しい総返済回数を計算
-            const base = P_monthly_original / (P_monthly_original - remainingBalance * i);
-            newN = Math.ceil(Math.log(base) / Math.log(1 + i)) + k; // k回返済済み + 新しい残りの回数
-            
-            // 4. 新しい総支払額を計算 (★この部分を修正しました★)
-            // 支払総額 = (k回分の支払い総額) + (繰り上げ返済額) + (残りの回数分の支払い総額)
-            
-            // 繰り上げ返済後の残りの支払い回数
-            const remainingPayments = newN - k; 
-            
-            // 繰り上げ返済後の総支払額
-            totalPayment = 
-                (monthlyPaymentOriginal * k) + // 繰り上げ返済前の支払い総額
-                prepaymentAmount +             // 繰り上げ返済額
-                (monthlyPaymentOriginal * remainingPayments); // 繰り上げ返済後の残りの支払い総額
-            
-            //
+        // 収支の計算
+        const netFlow = income - expense;
+        
+        // 資産残高の更新 (年間の収支を資産に加える)
+        currentAsset += netFlow; 
+
+        // 3. テーブル行の生成
+        const row = tableBody.insertRow();
+
+        row.insertCell().textContent = year;
+        row.insertCell().textContent = currentAge;
+        row.insertCell().textContent = formatMoney(income);
+        row.insertCell().textContent = formatMoney(expense);
+        
+        // 収支のセルに色を付ける
+        const netFlowCell = row.insertCell();
+        netFlowCell.textContent = formatMoney(netFlow);
+        netFlowCell.classList.add(netFlow >= 0 ? 'positive' : 'negative');
+
+        row.insertCell().textContent = formatMoney(currentAsset);
+    }
+}
+
+// 金額を見やすくするための関数
+function formatMoney(amount) {
+    // 億、万の単位に変換（元のコードの「万円」表示に近づける）
+    const万円 = Math.round(amount / 10000);
+    return 万円.toLocaleString() + ' 万円';
+}
+
+// ページ読み込み時に一度実行して初期表示
+runSimulation();

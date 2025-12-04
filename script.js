@@ -1,6 +1,7 @@
 // HTML要素を取得
 const getMealBtn = document.getElementById('get-meal-btn');
 const mealDisplay = document.getElementById('meal-display');
+// チェックボックスのNodeListを取得
 const checkboxes = document.querySelectorAll('input[name="cuisine"]');
 
 // TheMealDBのエンドポイント
@@ -18,8 +19,8 @@ async function getRandomMeal() {
 
     // 1. 選択されたジャンル（地域）を取得
     const selectedAreas = Array.from(checkboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value);
+        .filter(cb => cb.checked) // チェックされているもののみを抽出
+        .map(cb => cb.value);     // value（例: Japanese, Chinese）を取得
 
     if (selectedAreas.length === 0) {
         mealDisplay.innerHTML = '<p>献立のジャンルを1つ以上選択してください！</p>';
@@ -27,42 +28,56 @@ async function getRandomMeal() {
     }
 
     try {
-        // 2. 選択された地域ごとに料理リストを取得し、一つの配列にまとめる
+        // 2. 選択された地域ごとのデータ取得処理をまとめて実行
+        // Promise.allを使って全てのAPI呼び出しを並列で開始
+        const fetchPromises = selectedAreas.map(area => 
+            fetch(`${LIST_API_URL}${area}`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn(`地域: ${area} のデータ取得に失敗しました。`);
+                        return null; // 失敗時はnullを返す
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error(`Fetchエラー（${area}）:`, error);
+                    return null; // 通信エラー時もnullを返す
+                })
+        );
+
+        // 全てのレスポンスを待つ
+        const results = await Promise.all(fetchPromises);
+        
+        // 3. 取得した全料理リストからIDを抽出して一つの配列にまとめる
         let mealIds = [];
         
-        for (const area of selectedAreas) {
-            const response = await fetch(`${LIST_API_URL}${area}`);
-            if (!response.ok) {
-                console.warn(`地域: ${area} のデータ取得に失敗しました。`);
-                continue; // 失敗しても他の地域に進む
-            }
-            const data = await response.json();
-            
-            // 料理IDのみを抽出してリストに追加
-            if (data.meals) {
+        results.forEach(data => {
+            // データが正常に取得され、かつ料理リストが存在する場合のみ処理
+            if (data && data.meals && Array.isArray(data.meals)) {
                 const ids = data.meals.map(meal => meal.idMeal);
                 mealIds = mealIds.concat(ids);
             }
-        }
+        });
         
-        // 3. 取得した全料理リストからランダムで一つ選択
+        // 4. 料理が見つからなかった場合の処理
         if (mealIds.length === 0) {
-            mealDisplay.innerHTML = '<p>選択されたジャンルに一致する料理が見つかりませんでした😔</p>';
+            mealDisplay.innerHTML = '<p>選択されたジャンルに一致する料理が見つかりませんでした😔<br>別のジャンルを選択するか、すべてのチェックを外してランダムにしてください。</p>';
             return;
         }
 
+        // 5. 取得した全料理IDリストからランダムで一つ選択
         const randomIndex = Math.floor(Math.random() * mealIds.length);
         const randomMealId = mealIds[randomIndex];
         
-        // 4. 選択した料理IDの詳細情報を取得
+        // 6. 選択した料理IDの詳細情報を取得
         const detailResponse = await fetch(`${DETAIL_API_URL}${randomMealId}`);
         if (!detailResponse.ok) {
-            throw new Error(`料理の詳細情報取得に失敗しました。`);
+            throw new Error(`料理の詳細情報取得に失敗しました。ステータス: ${detailResponse.status}`);
         }
         const detailData = await detailResponse.json();
         const meal = detailData.meals[0];
 
-        // 5. 画面に表示
+        // 7. 画面に表示
         if (meal) {
             displayMeal(meal);
         } else {
@@ -70,7 +85,7 @@ async function getRandomMeal() {
         }
 
     } catch (error) {
-        console.error('献立の取得中にエラーが発生しました:', error);
+        console.error('献立の取得中に致命的なエラーが発生しました:', error);
         mealDisplay.innerHTML = `<p>エラーが発生しました: ${error.message}</p><p>インターネット接続やAPIの状況を確認してください。</p>`;
     }
 }
@@ -78,11 +93,9 @@ async function getRandomMeal() {
 
 /**
  * 取得した料理の詳細を画面に描画する関数
- * このバージョンでは、翻訳は行わず、英語のまま表示します。
- * 翻訳機能を再度追加する場合は、この関数をさらに拡張する必要があります。
+ * (表示ロジックは変更なし)
  */
 function displayMeal(meal) {
-    // 取得したデータから必要な情報を取得
     const mealName = meal.strMeal || '料理名不明';
     const category = meal.strCategory || '不明';
     const area = meal.strArea || '不明';

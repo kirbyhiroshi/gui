@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>住宅ローン返済額計算機</title>
+    <title>住宅ローン返済額計算機（繰り上げ返済対応）</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -34,6 +34,20 @@
             <input type="number" id="years" value="35" min="1">
         </div>
 
+        <hr>
+        <h2>💰 繰り上げ返済（期間短縮型）</h2>
+
+        <div class="input-group">
+            <label for="prepaymentAmount">繰り上げ返済額（万円）</label>
+            <input type="number" id="prepaymentAmount" value="0" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="prepaymentYear">繰り上げ返済を行うタイミング（返済開始から何年後か）</label>
+            <input type="number" id="prepaymentYear" value="0" min="0">
+        </div>
+        <hr>
+
         <button onclick="calculateLoan()">計算する</button>
 
         <div class="result-box">
@@ -45,6 +59,7 @@
         <div class="result-box" style="margin-top: 15px;">
             <h3>総支払額（元金＋利息）:</h3>
             <span id="totalPayment" class="result-value">---</span> 円
+            <p id="prepaymentSavings" class="note-text" style="margin-top: 10px; display: none;"></p>
         </div>
 
     </div>

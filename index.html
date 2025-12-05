@@ -1,22 +1,107 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>TheMealDB API 接続テスト</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>献立ランダムメーカー</title>
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-    <h1>TheMealDB API 接続テスト</h1>
 
-    <button id="fetchDataButton">レシピを取得する</button>
 
-    <hr>
+    <header>
 
-    <div id="output">
-        <p>ボタンを押すと結果が表示されます。</p>
-    </div>
+        <h1>🍽️ 献立ランダムメーカー</h1>
 
-    <script src="your_script_file_name.js"></script> 
+        <p>和洋中と食材/タイプを選択して、今日の献立を決めましょう！</p>
+
+    </header>
+
+
+
+    <main>
+
+        <section class="selection-box">
+
+            <h2>🌍 ジャンル選択</h2>
+
+            <div class="checkbox-group" id="category-group">
+
+                <input type="checkbox" name="category" value="Japanese" id="cat-japanese"><label for="cat-japanese"> 和食</label>
+
+                <input type="checkbox" name="category" value="Chinese" id="cat-chinese"><label for="cat-chinese"> 中華</label>
+
+                <input type="checkbox" name="category" value="Italian" id="cat-italian"><label for="cat-italian"> イタリアン (洋)</label>
+
+                <input type="checkbox" name="category" value="French" id="cat-french"><label for="cat-french"> フレンチ (洋)</label>
+
+            </div>
+
+        </section>
+
+
+
+        <section class="selection-box">
+
+            <h2>🥩 食材/タイプ選択</h2>
+
+            <div class="checkbox-group" id="ingredient-group">
+
+                <input type="checkbox" name="filter" value="Beef" id="filter-beef"><label for="filter-beef"> 肉 (牛)</label>
+
+                <input type="checkbox" name="filter" value="Chicken" id="filter-chicken"><label for="filter-chicken"> 肉 (鶏)</label>
+
+                <input type="checkbox" name="filter" value="Salmon" id="filter-salmon"><label for="filter-salmon"> 魚 (鮭)</label>
+
+                <input type="checkbox" name="filter" value="Noodles" id="filter-noodles"><label for="filter-noodles"> 麺類</label>
+
+                <input type="checkbox" name="filter" value="Dessert" id="filter-dessert"><label for="filter-dessert"> デザート</label>
+
+            </div>
+
+        </section>
+
+
+
+        <button id="decide-button">献立をきめる！</button>
+
+
+
+        <section id="result-area">
+
+            <h2>💡 今日の献立</h2>
+
+            <div id="meal-display">
+
+                <p>選択肢を選んでボタンを押すか、何も選ばずにボタンを押して完全にランダムな献立を表示します。</p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <footer>
+
+        <p>Powered by TheMealDB</p>
+
+    </footer>
+
+
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>

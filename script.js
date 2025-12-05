@@ -14,62 +14,85 @@ const downloadButton = document.getElementById('downloadButton');
 
 // --- 1. 時間データの収集（配列への追加） ---
 function recordClickTime() {
-    const currentTime = Date.now(); // 現在の時刻（ミリ秒）
+    console.log(`--- クリック #${intervals.length + 1} ---`); // デバッグ用ログ
+
+    const currentTime = Date.now(); 
 
     if (lastClickTime !== 0) {
         // 2回目以降のクリックなら、間隔を計算して配列に追加
         const interval = currentTime - lastClickTime;
         intervals.push(interval); 
+        console.log(`間隔: ${interval} ms`);
+    } else {
+        console.log("最初のクリックを記録。");
     }
 
     lastClickTime = currentTime; 
 
     // クリック回数の更新と表示
-    const currentCount = intervals.length + 1;
+    const currentCount = intervals.length + 1; // クリック回数 = 間隔の数 + 1
     
     if (currentCount <= MAX_CLICKS) {
         clickButton.textContent = `クリック中 (${currentCount}/${MAX_CLICKS})`;
         messageElement.textContent = `計測中...あと ${MAX_CLICKS - currentCount} 回`;
     }
     
-    // 規定回数クリックが完了したら計算へ
+    // 💡 修正ポイント: 間隔の数 (intervals.length) が MAX_CLICKS - 1 に達したら計算開始
     if (intervals.length === MAX_CLICKS - 1) { 
+        console.log("規定回数に達しました。BPM計算を開始します。");
         clickButton.disabled = true;
         messageElement.textContent = '計算中...しばらくお待ちください。';
+        
+        // 連続クリックで計算が複数回走るのを防ぐため、ボタンのイベントを一時的に解除
+        clickButton.onclick = null;
+        
         calculateBPM();
     }
 }
 
 // --- 2. BPMの計算と結果の表示 ---
 function calculateBPM() {
-    // 配列の合計値計算 (Array.reduce() を使用)
-    const sumOfIntervals = intervals.reduce((sum, current) => sum + current, 0);
+    try {
+        if (intervals.length === 0) {
+            console.error("エラー: 間隔データがありません。計算をスキップします。");
+            messageElement.textContent = 'エラー：クリック間隔が記録されませんでした。最初からやり直してください。';
+            return;
+        }
 
-    // 平均値計算
-    const averageIntervalMs = sumOfIntervals / intervals.length;
+        // 配列の合計値計算
+        const sumOfIntervals = intervals.reduce((sum, current) => sum + current, 0);
 
-    // BPM変換
-    const calculatedBPM = 60000 / averageIntervalMs;
+        // 平均値計算
+        const averageIntervalMs = sumOfIntervals / intervals.length;
 
-    const bpmValue = calculatedBPM.toFixed(2);
-    const avgValue = averageIntervalMs.toFixed(2);
-    
-    // 結果を画面に表示
-    displayBPM.textContent = bpmValue;
-    displayAvgInterval.textContent = avgValue;
-    resultArea.style.display = 'block'; // 結果エリアを表示
-    messageElement.textContent = '計測完了！JSONダウンロードボタンをクリックしてください。';
-    
-    // ダウンロードボタンにイベントリスナーを設定
-    downloadButton.style.display = 'block';
-    // 以前のリスナーが残らないように除去し、新しいリスナーを追加
-    downloadButton.onclick = () => exportToJSON(bpmValue, avgValue);
+        // BPM変換
+        const calculatedBPM = 60000 / averageIntervalMs;
+
+        const bpmValue = calculatedBPM.toFixed(2);
+        const avgValue = averageIntervalMs.toFixed(2);
+        
+        console.log(`計算完了: BPM=${bpmValue}, 平均間隔=${avgValue}ms`); // デバッグ用ログ
+
+        // 結果を画面に表示 (DOM操作)
+        displayBPM.textContent = bpmValue;
+        displayAvgInterval.textContent = avgValue;
+        resultArea.style.display = 'block'; 
+        messageElement.textContent = '計測完了！JSONダウンロードボタンをクリックしてください。';
+        
+        // ダウンロードボタンにイベントリスナーを設定
+        downloadButton.style.display = 'block';
+        downloadButton.onclick = () => exportToJSON(bpmValue, avgValue);
+
+    } catch (e) {
+        console.error("BPM計算中にエラーが発生しました:", e);
+        messageElement.textContent = '計算中に予期せぬエラーが発生しました。';
+    }
 }
 
 // --- 3. データのエクスポート（JSON保存） ---
 function exportToJSON(bpmValue, avgInterval) {
+    // ... (exportToJSON のコードは前回と同じで問題ありません) ...
     const resultObject = {
-        // データのリスト（オブジェクト）
         timestamp: new Date().toISOString(), 
         bpm: parseFloat(bpmValue),           
         average_interval_ms: parseFloat(avgInterval),
@@ -77,16 +100,14 @@ function exportToJSON(bpmValue, avgInterval) {
         intervals_count: intervals.length      
     };
 
-    // JSON形式の文字列に変換
     const jsonString = JSON.stringify(resultObject, null, 2);
     
-    // JSONファイルを生成し、ダウンロードさせる処理
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = `bpm_data_${new Date().toLocaleDateString('ja-JP').replace(/\//g, '-')}.json`; // ダウンロードファイル名
+    a.download = `bpm_data_${new Date().toLocaleDateString('ja-JP').replace(/\//g, '-')}.json`;
     
     document.body.appendChild(a);
     a.click();
@@ -95,7 +116,6 @@ function exportToJSON(bpmValue, avgInterval) {
     URL.revokeObjectURL(url);
     alert('JSONファイルがダウンロードされました！');
 
-    // 測定終了後、ページをリロードして再測定できるようにする
     setTimeout(() => {
         window.location.reload(); 
     }, 1000); 

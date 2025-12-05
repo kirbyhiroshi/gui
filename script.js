@@ -1,122 +1,175 @@
 // --- グローバル変数と定数 ---
 let lastClickTime = 0;   // 前回のクリック時刻（ミリ秒）
-let intervals = [];      // クリック間隔（ミリ秒）を格納する配列
-const MAX_CLICKS = 5;    // 計測を完了するクリック回数
+// 直近5回分の間隔を保持する配列 (スライディングウィンドウ)
+let intervals = [];      
+const MAX_INTERVALS = 5; // BPM計算に使用する間隔の数
+const RECORDS_KEY = 'bpmRecords'; // localStorageに保存する際のキー
 
 // --- DOM要素の取得 ---
-const clickButton = document.getElementById('clickButton');
-const messageElement = document.getElementById('message');
-const resultArea = document.getElementById('resultArea');
 const displayBPM = document.getElementById('displayBPM');
-const displayAvgInterval = document.getElementById('displayAvgInterval');
-const downloadButton = document.getElementById('downloadButton');
+const messageElement = document.getElementById('message');
+const songTitleInput = document.getElementById('songTitle');
+const saveButton = document.getElementById('saveButton');
+const recordList = document.getElementById('recordList');
 
 
-// --- 1. 時間データの収集（配列への追加） ---
-function recordClickTime() {
-    console.log(`--- クリック #${intervals.length + 1} ---`); // デバッグ用ログ
+// =================================================================
+// 測定モード (BPM計算ロジック)
+// =================================================================
 
+/**
+ * タップ（クリックまたはスペースキー）イベントを処理するメイン関数
+ */
+function tapTempo() {
     const currentTime = Date.now(); 
 
     if (lastClickTime !== 0) {
-        // 2回目以降のクリックなら、間隔を計算して配列に追加
         const interval = currentTime - lastClickTime;
+
+        // 💡 高精度化: スライディングウィンドウを維持
+        if (intervals.length >= MAX_INTERVALS) {
+            // 5個の間隔が揃ったら、一番古い間隔を削除 (FIFO: First-In, First-Out)
+            intervals.shift(); 
+        }
+        // 新しい間隔を追加
         intervals.push(interval); 
-        console.log(`間隔: ${interval} ms`);
-    } else {
-        console.log("最初のクリックを記録。");
+        
+        // 間隔が2個以上になったら (3回目以降のクリック)、BPMを計算して表示
+        if (intervals.length >= 2) {
+            calculateBPM();
+        } else {
+            messageElement.textContent = `あと ${MAX_INTERVALS + 1 - (intervals.length + 1)} 回タップで精度向上...`;
+        }
     }
 
     lastClickTime = currentTime; 
 
-    // クリック回数の更新と表示
-    const currentCount = intervals.length + 1; // クリック回数 = 間隔の数 + 1
-    
-    if (currentCount <= MAX_CLICKS) {
-        clickButton.textContent = `クリック中 (${currentCount}/${MAX_CLICKS})`;
-        messageElement.textContent = `計測中...あと ${MAX_CLICKS - currentCount} 回`;
-    }
-    
-    // 💡 修正ポイント: 間隔の数 (intervals.length) が MAX_CLICKS - 1 に達したら計算開始
-    if (intervals.length === MAX_CLICKS - 1) { 
-        console.log("規定回数に達しました。BPM計算を開始します。");
-        clickButton.disabled = true;
-        messageElement.textContent = '計算中...しばらくお待ちください。';
-        
-        // 連続クリックで計算が複数回走るのを防ぐため、ボタンのイベントを一時的に解除
-        clickButton.onclick = null;
-        
-        calculateBPM();
+    // BPMが計算されたら保存ボタンを有効化
+    if (intervals.length >= 2) {
+        saveButton.disabled = false;
     }
 }
 
-// --- 2. BPMの計算と結果の表示 ---
+/**
+ * 直近のintervals配列からBPMを計算し、画面に表示する
+ */
 function calculateBPM() {
-    try {
-        if (intervals.length === 0) {
-            console.error("エラー: 間隔データがありません。計算をスキップします。");
-            messageElement.textContent = 'エラー：クリック間隔が記録されませんでした。最初からやり直してください。';
-            return;
-        }
+    // 配列の合計値計算
+    const sumOfIntervals = intervals.reduce((sum, current) => sum + current, 0);
 
-        // 配列の合計値計算
-        const sumOfIntervals = intervals.reduce((sum, current) => sum + current, 0);
+    // 平均値計算 
+    const averageIntervalMs = sumOfIntervals / intervals.length;
 
-        // 平均値計算
-        const averageIntervalMs = sumOfIntervals / intervals.length;
+    // BPM変換 (60,000ms / 平均間隔)
+    const calculatedBPM = 60000 / averageIntervalMs;
 
-        // BPM変換
-        const calculatedBPM = 60000 / averageIntervalMs;
+    const bpmValue = calculatedBPM.toFixed(2);
 
-        const bpmValue = calculatedBPM.toFixed(2);
-        const avgValue = averageIntervalMs.toFixed(2);
-        
-        console.log(`計算完了: BPM=${bpmValue}, 平均間隔=${avgValue}ms`); // デバッグ用ログ
-
-        // 結果を画面に表示 (DOM操作)
-        displayBPM.textContent = bpmValue;
-        displayAvgInterval.textContent = avgValue;
-        resultArea.style.display = 'block'; 
-        messageElement.textContent = '計測完了！JSONダウンロードボタンをクリックしてください。';
-        
-        // ダウンロードボタンにイベントリスナーを設定
-        downloadButton.style.display = 'block';
-        downloadButton.onclick = () => exportToJSON(bpmValue, avgValue);
-
-    } catch (e) {
-        console.error("BPM計算中にエラーが発生しました:", e);
-        messageElement.textContent = '計算中に予期せぬエラーが発生しました。';
-    }
+    // 💡 測定モード: BPMをリアルタイムで表示
+    displayBPM.textContent = bpmValue;
+    messageElement.textContent = `直近 ${intervals.length} 回の平均BPMを表示中`;
 }
 
-// --- 3. データのエクスポート（JSON保存） ---
-function exportToJSON(bpmValue, avgInterval) {
-    // ... (exportToJSON のコードは前回と同じで問題ありません) ...
-    const resultObject = {
-        timestamp: new Date().toISOString(), 
-        bpm: parseFloat(bpmValue),           
-        average_interval_ms: parseFloat(avgInterval),
-        clicks_used: MAX_CLICKS,
-        intervals_count: intervals.length      
+
+// =================================================================
+// 記録モード (永続化ロジック)
+// =================================================================
+
+/**
+ * localStorageからレコードを読み込む
+ * @returns {Array} 保存されたレコードの配列
+ */
+function loadRecords() {
+    const json = localStorage.getItem(RECORDS_KEY);
+    return json ? JSON.parse(json) : [];
+}
+
+/**
+ * 測定結果を保存し、リストを更新する
+ */
+function saveRecord() {
+    const title = songTitleInput.value.trim();
+    const bpm = displayBPM.textContent;
+    
+    if (bpm === '--' || intervals.length < 2) {
+        alert("BPMを測定してから保存してください。");
+        return;
+    }
+
+    if (!title) {
+        alert("曲名を入力してください。");
+        return;
+    }
+
+    const newRecord = {
+        title: title,
+        bpm: parseFloat(bpm),
+        timestamp: new Date().toLocaleString()
     };
 
-    const jsonString = JSON.stringify(resultObject, null, 2);
+    const records = loadRecords();
+    records.push(newRecord);
     
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bpm_data_${new Date().toLocaleDateString('ja-JP').replace(/\//g, '-')}.json`;
-    
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    
-    URL.revokeObjectURL(url);
-    alert('JSONファイルがダウンロードされました！');
+    // localStorageに保存 (永続化)
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
 
-    setTimeout(() => {
-        window.location.reload(); 
-    }, 1000); 
+    // リストを再描画
+    renderRecords(records);
+    
+    // UIをリセット
+    songTitleInput.value = '';
+    saveButton.disabled = true;
+    messageElement.textContent = `${title} (BPM ${bpm}) をリストに保存しました！`;
 }
+
+/**
+ * 保存されたレコードを画面に表示する
+ * @param {Array} records - 表示するレコードの配列
+ */
+function renderRecords(records) {
+    recordList.innerHTML = ''; // リストをクリア
+    
+    if (records.length === 0) {
+        recordList.innerHTML = '<li>まだ保存されたレコードはありません。</li>';
+        return;
+    }
+
+    records.forEach(record => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div>
+                <strong>${record.title}</strong>
+                <br>
+                <small>${record.timestamp}</small>
+            </div>
+            <span class="bpm-tag">${record.bpm.toFixed(2)} BPM</span>
+        `;
+        recordList.appendChild(li);
+    });
+}
+
+
+// =================================================================
+// 初期設定とイベントリスナー
+// =================================================================
+
+// 🚀 ページロード時に実行
+document.addEventListener('DOMContentLoaded', () => {
+    // 記録モード: localStorageからデータを読み込み、リストを初期表示
+    renderRecords(loadRecords());
+    
+    // 測定モード: ボタンクリックのイベントリスナー
+    document.getElementById('tapButton').addEventListener('click', tapTempo);
+
+    // 測定モード: スペースキーのキーダウンイベントリスナー
+    document.addEventListener('keydown', (e) => {
+        // スペースキーが押されたとき、かつ入力フォーム外で押されたときのみ実行
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+            e.preventDefault(); // 画面のスクロールなどを防ぐ
+            tapTempo();
+        }
+    });
+
+    // 記録モード: 保存ボタンのイベントリスナー
+    saveButton.addEventListener('click', saveRecord);
+});

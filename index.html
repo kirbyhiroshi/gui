@@ -12,9 +12,9 @@
         <h1>BPM クリック計測ツール</h1>
 
         <section id="measurementMode">
-            <h2>測定モード</h2>
+            <h2>🎵 測定モード</h2>
             <p class="instruction">
-                下のボタンをクリックするか、**スペースキー**をリズムよく叩いてください。
+                下のボタンまたは**スペースキー**をリズムよく叩いてください。
             </p>
 
             <button id="tapButton">
@@ -30,17 +30,30 @@
 
         <hr>
 
-        <section id="recordMode">
-            <h2>記録モード</h2>
+        <section id="recordArea" style="display: none;">
+            <h2>💾 測定結果の保存</h2>
             <div class="input-group">
-                <label for="songTitle">曲名:</label>
-                <input type="text" id="songTitle" placeholder="例: 測定した曲名を入力">
-                <button id="saveButton" disabled>測定結果を保存</button>
+                <label for="songTitle">曲名を入力:</label>
+                <input type="text" id="songTitle" placeholder="測定した曲名を入力してください">
+                <button id="saveButton" disabled>このBPMで保存</button>
             </div>
+        </section>
 
-            <h3>保存済みレコード</h3>
-            <ul id="recordList">
-                </ul>
+        <hr>
+
+        <section id="recordListArea">
+            <h2>📜 保存した楽曲リスト</h2>
+            <table id="recordTable">
+                <thead>
+                    <tr>
+                        <th>曲名</th>
+                        <th>BPM</th>
+                        <th>記録日時</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
         </section>
     </div>
 

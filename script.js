@@ -1,40 +1,36 @@
 // --- グローバル変数と定数 ---
-let lastClickTime = 0;   // 前回のクリック時刻（ミリ秒）
-// 直近5回分の間隔を保持する配列 (スライディングウィンドウ)
+let lastClickTime = 0;   
 let intervals = [];      
-const MAX_INTERVALS = 5; // BPM計算に使用する間隔の数
-const RECORDS_KEY = 'bpmRecords'; // localStorageに保存する際のキー
+const MAX_INTERVALS = 5; 
+const RECORDS_KEY = 'bpmRecords'; 
 
 // --- DOM要素の取得 ---
+// ... (既存の取得要素はそのまま) ...
 const displayBPM = document.getElementById('displayBPM');
 const messageElement = document.getElementById('message');
 const songTitleInput = document.getElementById('songTitle');
 const saveButton = document.getElementById('saveButton');
-const recordList = document.getElementById('recordList');
+// 💡 変更: ulの代わりにテーブルのtbodyを取得
+const recordTableBody = document.querySelector('#recordTable tbody'); 
+const recordArea = document.getElementById('recordArea');
 
 
 // =================================================================
-// 測定モード (BPM計算ロジック)
+// 測定モード (BPM計算ロジック) - (変更なし)
 // =================================================================
 
-/**
- * タップ（クリックまたはスペースキー）イベントを処理するメイン関数
- */
 function tapTempo() {
+    // ... (前回コードと同じ) ...
     const currentTime = Date.now(); 
 
     if (lastClickTime !== 0) {
         const interval = currentTime - lastClickTime;
 
-        // 💡 高精度化: スライディングウィンドウを維持
         if (intervals.length >= MAX_INTERVALS) {
-            // 5個の間隔が揃ったら、一番古い間隔を削除 (FIFO: First-In, First-Out)
             intervals.shift(); 
         }
-        // 新しい間隔を追加
         intervals.push(interval); 
         
-        // 間隔が2個以上になったら (3回目以降のクリック)、BPMを計算して表示
         if (intervals.length >= 2) {
             calculateBPM();
         } else {
@@ -44,28 +40,20 @@ function tapTempo() {
 
     lastClickTime = currentTime; 
 
-    // BPMが計算されたら保存ボタンを有効化
+    // BPMが計算されたら保存ボタンを有効化し、保存エリアを表示
     if (intervals.length >= 2) {
         saveButton.disabled = false;
+        recordArea.style.display = 'block'; // 💡 測定完了後に表示
     }
 }
 
-/**
- * 直近のintervals配列からBPMを計算し、画面に表示する
- */
 function calculateBPM() {
-    // 配列の合計値計算
+    // ... (前回コードと同じ) ...
     const sumOfIntervals = intervals.reduce((sum, current) => sum + current, 0);
-
-    // 平均値計算 
     const averageIntervalMs = sumOfIntervals / intervals.length;
-
-    // BPM変換 (60,000ms / 平均間隔)
     const calculatedBPM = 60000 / averageIntervalMs;
 
     const bpmValue = calculatedBPM.toFixed(2);
-
-    // 💡 測定モード: BPMをリアルタイムで表示
     displayBPM.textContent = bpmValue;
     messageElement.textContent = `直近 ${intervals.length} 回の平均BPMを表示中`;
 }
@@ -75,22 +63,16 @@ function calculateBPM() {
 // 記録モード (永続化ロジック)
 // =================================================================
 
-/**
- * localStorageからレコードを読み込む
- * @returns {Array} 保存されたレコードの配列
- */
 function loadRecords() {
     const json = localStorage.getItem(RECORDS_KEY);
     return json ? JSON.parse(json) : [];
 }
 
-/**
- * 測定結果を保存し、リストを更新する
- */
 function saveRecord() {
     const title = songTitleInput.value.trim();
     const bpm = displayBPM.textContent;
     
+    // ... (エラーチェックは前回と同じ) ...
     if (bpm === '--' || intervals.length < 2) {
         alert("BPMを測定してから保存してください。");
         return;
@@ -110,7 +92,6 @@ function saveRecord() {
     const records = loadRecords();
     records.push(newRecord);
     
-    // localStorageに保存 (永続化)
     localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
 
     // リストを再描画
@@ -123,37 +104,36 @@ function saveRecord() {
 }
 
 /**
- * 保存されたレコードを画面に表示する
+ * 💡 修正: 保存されたレコードを画面にテーブル形式で表示する
  * @param {Array} records - 表示するレコードの配列
  */
 function renderRecords(records) {
-    recordList.innerHTML = ''; // リストをクリア
+    recordTableBody.innerHTML = ''; // tbodyの内容をクリア
     
     if (records.length === 0) {
-        recordList.innerHTML = '<li>まだ保存されたレコードはありません。</li>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="3" style="text-align: center;">まだ保存された楽曲はありません。</td>';
+        recordTableBody.appendChild(tr);
         return;
     }
 
-    records.forEach(record => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div>
-                <strong>${record.title}</strong>
-                <br>
-                <small>${record.timestamp}</small>
-            </div>
-            <span class="bpm-tag">${record.bpm.toFixed(2)} BPM</span>
+    // 最新のレコードが上に来るように配列を反転
+    [...records].reverse().forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${record.title}</td>
+            <td class="bpm-cell">${record.bpm.toFixed(2)}</td>
+            <td>${record.timestamp}</td>
         `;
-        recordList.appendChild(li);
+        recordTableBody.appendChild(tr);
     });
 }
 
 
 // =================================================================
-// 初期設定とイベントリスナー
+// 初期設定とイベントリスナー (変更なし)
 // =================================================================
 
-// 🚀 ページロード時に実行
 document.addEventListener('DOMContentLoaded', () => {
     // 記録モード: localStorageからデータを読み込み、リストを初期表示
     renderRecords(loadRecords());
@@ -163,9 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 測定モード: スペースキーのキーダウンイベントリスナー
     document.addEventListener('keydown', (e) => {
-        // スペースキーが押されたとき、かつ入力フォーム外で押されたときのみ実行
         if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
-            e.preventDefault(); // 画面のスクロールなどを防ぐ
+            e.preventDefault(); 
             tapTempo();
         }
     });

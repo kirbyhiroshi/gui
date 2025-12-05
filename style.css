@@ -1,143 +1,80 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f7f6;
-    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     margin: 0;
-    padding: 0;
     text-align: center;
 }
 
-header {
+.container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#clickButton {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    color: #fff;
     background-color: #007bff;
-    color: white;
-    padding: 20px 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-header p {
-    margin-top: 5px;
-    font-size: 0.9rem;
-    opacity: 0.9;
+#clickButton:hover:enabled {
+    background-color: #0056b3;
 }
 
-main {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
+#clickButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.selection-box {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    text-align: left;
+.status-message {
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 30px;
 }
 
-h2 {
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #e9ecef;
+}
+
+.result-box h3 {
     color: #007bff;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
     margin-top: 0;
 }
 
-.checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.checkbox-group label {
-    background-color: #e9f7ff;
-    border: 1px solid #cce5ff;
+#downloadButton {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
     border-radius: 5px;
-    padding: 8px 12px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-/* CSSの隣接セレクタを使って、チェックされたinputの直後のlabelにスタイルを適用 */
-.checkbox-group input[type="checkbox"]:checked + label {
-    background-color: #007bff;
-    color: white;
-    border-color: #0056b3;
-}
-
-.checkbox-group input[type="checkbox"] {
-    /* チェックボックス自体を非表示にする */
-    display: none;
-}
-
-#decide-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-bottom: 30px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-#decide-button:hover {
+#downloadButton:hover {
     background-color: #1e7e34;
-}
-
-#meal-display {
-    text-align: left;
-    background-color: #ffffff;
-    border: 1px solid #e9ecef;
-    padding: 20px;
-    border-radius: 8px;
-    min-height: 150px;
-}
-
-.meal-card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: flex-start;
-    background-color: #ffffff;
-}
-
-@media (min-width: 600px) {
-    .meal-card {
-        flex-direction: row;
-        align-items: center;
-    }
-}
-
-.meal-card img {
-    width: 100%; 
-    max-width: 200px;
-    height: auto;
-    object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.meal-info {
-    flex-grow: 1;
-}
-
-.meal-info h3 {
-    margin-top: 0;
-    color: #dc3545;
-}
-
-footer {
-    margin-top: 50px;
-    padding: 10px 0;
-    color: #777;
-    font-size: 0.9rem;
 }

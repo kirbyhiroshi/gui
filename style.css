@@ -6,75 +6,118 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    text-align: center;
+    color: #333;
 }
 
 .container {
     background-color: #ffffff;
-    padding: 40px;
+    padding: 30px 50px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 400px;
+    max-width: 500px;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 20px;
+h1, h2 {
+    color: #007bff;
+    text-align: center;
 }
 
-#clickButton {
-    padding: 15px 30px;
+/* 測定ボタン */
+#tapButton {
+    padding: 20px 0;
     font-size: 1.2em;
     color: #fff;
-    background-color: #007bff;
+    background-color: #28a745;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s;
     width: 100%;
-    margin-bottom: 20px;
+    margin: 15px 0;
+    box-shadow: 0 3px #1e7e34;
 }
 
-#clickButton:hover:enabled {
-    background-color: #0056b3;
+#tapButton:active {
+    box-shadow: none;
+    transform: translateY(3px);
 }
 
-#clickButton:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.status-message {
-    font-weight: bold;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-.result-box {
-    margin-top: 20px;
+/* BPMリアルタイム表示 */
+#realtimeDisplay {
+    text-align: center;
+    margin: 20px 0;
     padding: 15px;
+    background-color: #f8f9fa;
     border: 1px solid #ddd;
     border-radius: 5px;
-    background-color: #e9ecef;
 }
 
-.result-box h3 {
-    color: #007bff;
-    margin-top: 0;
+#displayBPM {
+    font-size: 3.5em;
+    font-weight: bold;
+    color: #dc3545;
 }
 
-#downloadButton {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
+.unit {
+    font-size: 1.5em;
+    color: #6c757d;
+}
+
+/* 記録モード */
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+#songTitle {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#saveButton {
+    padding: 10px 15px;
+    background-color: #ffc107;
+    color: #333;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-#downloadButton:hover {
-    background-color: #1e7e34;
+#saveButton:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+#recordList {
+    list-style: none;
+    padding: 0;
+}
+
+#recordList li {
+    background-color: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bpm-tag {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 30px 0;
 }

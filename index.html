@@ -3,29 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPM クリックトラッカー</title>
+    <title>高精度 BPM クリックトラッカー</title>
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
     <div class="container">
         <h1>BPM クリック計測ツール</h1>
-        <p>一定のリズムでボタンを **5回** クリックしてください。</p>
 
-        <button id="clickButton" onclick="recordClickTime()">
-            計測を開始 (0/5)
-        </button>
-        
-        <p id="message" class="status-message">準備完了</p>
+        <section id="measurementMode">
+            <h2>測定モード</h2>
+            <p class="instruction">
+                下のボタンをクリックするか、**スペースキー**をリズムよく叩いてください。
+            </p>
 
-        <div id="resultArea" class="result-box" style="display: none;">
-            <h3>計測結果</h3>
-            <p>BPM: <span id="displayBPM">--</span></p>
-            <p>平均間隔: <span id="displayAvgInterval">--</span> ms</p>
-            <button id="downloadButton" style="display: none;">
-                JSONデータをダウンロード
+            <button id="tapButton">
+                TAP (スペースキー)
             </button>
-        </div>
+            
+            <div id="realtimeDisplay">
+                <span id="displayBPM">--</span> <span class="unit">BPM</span>
+            </div>
+            
+            <p id="message" class="status-message">計測準備完了</p>
+        </section>
+
+        <hr>
+
+        <section id="recordMode">
+            <h2>記録モード</h2>
+            <div class="input-group">
+                <label for="songTitle">曲名:</label>
+                <input type="text" id="songTitle" placeholder="例: 測定した曲名を入力">
+                <button id="saveButton" disabled>測定結果を保存</button>
+            </div>
+
+            <h3>保存済みレコード</h3>
+            <ul id="recordList">
+                </ul>
+        </section>
     </div>
 
     <script src="script.js"></script> 

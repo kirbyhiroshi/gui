@@ -1,24 +1,33 @@
-let lastClickTime = 0; // 最後にクリックした時刻 (初期値 0)
-let intervals = [];    // クリック間隔 (ミリ秒) を格納する配列
-const MAX_CLICKS = 5; // クリック回数の上限
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM クリックトラッカー</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
 
-// 🌟 マウスをクリックするたびに呼ばれる関数
-function recordClickTime() {
-    const currentTime = Date.now(); // 現在の時刻（ミリ秒）を取得
+    <div class="container">
+        <h1>BPM クリック計測ツール</h1>
+        <p>一定のリズムでボタンを **5回** クリックしてください。</p>
 
-    if (lastClickTime !== 0) {
-        // 2回目以降のクリックなら、間隔を計算して配列に追加
-        const interval = currentTime - lastClickTime;
-        intervals.push(interval); // 配列の末尾に追加
+        <button id="clickButton" onclick="recordClickTime()">
+            計測を開始 (0/5)
+        </button>
+        
+        <p id="message" class="status-message">準備完了</p>
 
-        console.log(`クリック間隔: ${interval} ms`);
-    }
+        <div id="resultArea" class="result-box" style="display: none;">
+            <h3>計測結果</h3>
+            <p>BPM: <span id="displayBPM">--</span></p>
+            <p>平均間隔: <span id="displayAvgInterval">--</span> ms</p>
+            <button id="downloadButton" style="display: none;">
+                JSONデータをダウンロード
+            </button>
+        </div>
+    </div>
 
-    // 現在の時刻を「前回の時刻」として保存 (変数の更新)
-    lastClickTime = currentTime; 
-
-    // 5回クリックが完了したら計算へ
-    if (intervals.length === MAX_CLICKS - 1) { // 間隔の数はクリック回数 - 1
-        calculateBPM();
-    }
-}
+    <script src="script.js"></script> 
+</body>
+</html>

@@ -91,28 +91,38 @@ async function handleFormSubmit(event) {
     
     document.getElementById('submit-btn').disabled = true;
 
-    try {
-        const response = await fetch(GAS_URL, {
-            method: 'POST',
-            body: new URLSearchParams(data) // POSTデータとして送信
-        });
+   // handleFormSubmit 関数内の try ブロック
+try {
+    const response = await fetch(GAS_URL, {
+        method: 'POST',
+        body: new URLSearchParams(data) // POSTデータとして送信
+    });
 
-        const result = await response.json();
-
-        if (result.status === 'success') {
-            alert('日報を送信しました！');
-            form.reset(); // フォームをクリア
-            fetchReports(); // 一覧を再取得して更新
-        } else {
-            alert('送信失敗: ' + (result.message || '不明なエラー'));
-        }
-
-    } catch (error) {
-        alert('ネットワークエラーにより送信できませんでした。');
-        console.error('投稿エラー:', error);
-    } finally {
-        document.getElementById('submit-btn').disabled = false;
+    // ★★★ 修正箇所 1: レスポンスステータスのチェック ★★★
+    if (!response.ok) {
+        // HTTPステータスコードが200番台でない場合 (404や500エラーなど)
+        throw new Error(`HTTPエラーが発生しました。ステータス: ${response.status}`);
     }
+
+    // ★★★ 修正箇所 2: JSON解析 ★★★
+    const result = await response.json();
+
+    if (result.status === 'success') {
+        alert('日報を送信しました！');
+        form.reset(); // フォームをクリア
+        fetchReports(); // 一覧を再取得して更新
+    } else {
+        // GAS側で意図的に返されたエラーメッセージを表示
+        alert('送信失敗: ' + (result.message || '不明なエラー'));
+    }
+
+} catch (error) {
+    // ネットワークエラー、または上記でスローされたHTTPエラーを捕捉
+    alert('送信できませんでした。原因: ' + error.message);
+    console.error('投稿エラー:', error);
+} finally {
+    document.getElementById('submit-btn').disabled = false;
+}
 }
 
 // ------------------------------------------------------------------

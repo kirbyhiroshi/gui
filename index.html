@@ -2,61 +2,51 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ええいいやああ君からもらい泣き</title>
+    <title>TeamSync Report | システム課日報</title>
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
+    <header>
+        <h1>TeamSync Report</h1>
+    </header>
 
-    <div class="container">
-        <h1>んひいいいい</h1>
-
-        <section id="measurementMode">
-            <h2>🎵 測定モード</h2>
-            <p class="instruction">
-                下のボタンまたは<b>**スペースキー**</b>をリズムよく叩いてください。
-            </p>
-
-            <h2><img id="food-img" src="img/header-character.png"></h2>
-            <button id="tapButton">
-                TAP (スペースキー)
-            </button>
-            
-            <div id="realtimeDisplay">
-                <span id="displayBPM">--</span> <span class="unit">BPM</span>
-            </div>
-            
-            <p id="message" class="status-message">計測準備完了</p>
+    <main>
+        <section id="post-section">
+            <h2>日報投稿</h2>
+            <form id="report-form">
+                <label for="name">名前: <span class="required">*</span></label>
+                <input type="text" id="name" name="名前" required>
+                
+                <label for="condition">コンディション: <span class="required">*</span></label>
+                <select id="condition" name="コンディション" required>
+                    <option value="">選択してください</option>
+                    <option value="😀">😀 (好調)</option>
+                    <option value="🙂">🙂 (普通)</option>
+                    <option value="😫">😫 (不調)</option>
+                </select>
+                
+                <label for="today-done">今日やったこと:</label>
+                <textarea id="today-done" name="今日やったこと"></textarea>
+                
+                <label for="tomorrow-do">翌営業日やること:</label>
+                <textarea id="tomorrow-do" name="翌営業日やること"></textarea>
+                
+                <label for="feelings">所感・学び:</label>
+                <textarea id="feelings" name="所感_学び"></textarea>
+                
+                <button type="submit" id="submit-btn">日報を送信</button>
+                <p id="message" class="hidden"></p>
+            </form>
         </section>
 
         <hr>
 
-        <section id="recordArea" style="display: none;">
-            <h2>💾 測定結果の保存</h2>
-            <div class="input-group">
-                <label for="songTitle">曲名を入力:</label>
-                <input type="text" id="songTitle" placeholder="測定した曲名を入力してください">
-                <button id="saveButton" disabled>このBPMで保存</button>
-            </div>
+        <section id="list-section">
+            <h2>過去の日報一覧</h2>
+            <div id="report-list">
+                </div>
         </section>
-
-        <hr>
-
-        <section id="recordListArea">
-            <h2>📜 保存した楽曲リスト</h2>
-            <table id="recordTable">
-                <thead>
-                    <tr>
-                        <th>曲名</th>
-                        <th>BPM</th>
-                        <th>記録日時</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        </section>
-    </div>
+    </main>
 
     <script src="script.js"></script> 
 </body>

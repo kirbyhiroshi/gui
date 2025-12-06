@@ -1,133 +1,98 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    font-family: sans-serif;
     margin: 0;
-    color: #333;
+    padding: 0;
+    background-color: #f4f4f9;
 }
 
-.container {
-    background-color: #ffffff;
-    padding: 30px 50px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 600px; /* 幅を少し広げました */
-}
-
-h1, h2 {
-    color: #007bff;
-    text-align: center;
-}
-
-/* 測定ボタン */
-#tapButton {
-    padding: 20px 0;
-    font-size: 1.2em;
-    color: #fff;
-    background-color: #28a745;
-    /* ... (その他のスタイルは省略) ... */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: 100%;
-    margin: 15px 0;
-    box-shadow: 0 3px #1e7e34;
-}
-
-#tapButton:active {
-    box-shadow: none;
-    transform: translateY(3px);
-}
-
-/* BPMリアルタイム表示 */
-#realtimeDisplay {
-    text-align: center;
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-#displayBPM {
-    font-size: 3.5em;
-    font-weight: bold;
-    color: #dc3545;
-}
-
-.unit {
-    font-size: 1.5em;
-    color: #6c757d;
-}
-
-/* 記録/保存エリアのスタイル */
-.input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    align-items: center;
-}
-
-#songTitle {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#saveButton {
-    padding: 10px 15px;
-    background-color: #ffc107;
-    color: #333;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-#saveButton:disabled {
-    background-color: #e9ecef;
-    color: #6c757d;
-    cursor: not-allowed;
-}
-
-hr {
-    border: 0;
-    height: 1px;
-    background: #ccc;
-    margin: 30px 0;
-}
-
-/* 💡 保存リスト（表形式）のスタイル */
-#recordTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-#recordTable th, #recordTable td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-#recordTable thead th {
+header {
     background-color: #007bff;
     color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* フォームのスタイル */
+#report-form label {
+    display: block;
+    margin-top: 10px;
     font-weight: bold;
 }
 
-#recordTable tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+#report-form input[type="text"], 
+#report-form select, 
+#report-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
-.bpm-cell {
-    font-weight: bold;
-    color: #dc3545;
-    text-align: center !important;
+#report-form textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+.required {
+    color: red;
+}
+
+#submit-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* 日報一覧のスタイル */
+.report-item {
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.report-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.report-meta {
+    font-size: 14px;
+    color: #666;
+}
+
+.like-button {
+    background-color: #ffc107;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
 }

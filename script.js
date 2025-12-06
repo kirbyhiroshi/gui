@@ -1,30 +1,30 @@
 // ★★★★ 必須：デプロイで取得したウェブアプリのURLに置き換えてください ★★★★
-const GAS_URL = 'https://script.google.com/a/macros/toho-next.com/s/AKfycbyKpw8OmyCVimgD4msNdhNxzhOfNWYZBDNyoQ1rDgGOdcqzdYU92iuy6Tir3zFKfeAorQ/exec';
+const GAS_URL = 'あなたのGASウェブアプリURL'; // ← ここがHTTPSで正しいか確認
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. ページ読み込み時に日報一覧を取得・表示
-    fetchReports();
-
-    // 2. フォーム送信イベントを設定
-    document.getElementById('report-form').addEventListener('submit', handleFormSubmit);
+    // ページ読み込み時に日報一覧を取得・表示
+    fetchReports(); 
+    // ... 他のイベントリスナー設定 ...
 });
 
 // ------------------------------------------------------------------
-// ★ 日報一覧を取得して表示する (機能要件②)
+// ★ 日報一覧を取得して表示する関数
 // ------------------------------------------------------------------
 async function fetchReports() {
     const listElement = document.getElementById('report-list');
     listElement.innerHTML = '読み込み中...'; 
 
     try {
+        // GAS URLへGETリクエストを送信
         const response = await fetch(GAS_URL, { method: 'GET' });
+        // レスポンスをJSONとして解析
         const reports = await response.json(); 
         
-        listElement.innerHTML = ''; 
+        listElement.innerHTML = ''; // ローディング表示をクリア
 
-        // データベース接続エラーがJSONとして返された場合
+        // 1. エラーメッセージが返ってきた場合 (画像 6c0ec0 のケース)
         if (reports.error) {
-            listElement.innerHTML = `<p style="color:red;">エラー: ${reports.error}</p>`;
+            listElement.innerHTML = `<p style="color:red;">エラー発生: ${reports.error}</p>`;
             return;
         }
 
@@ -33,18 +33,19 @@ async function fetchReports() {
             return;
         }
 
+        // 2. 正常なデータが返ってきた場合 (画像 6c037f のデータ整形)
         reports.forEach(report => {
             const item = document.createElement('div');
             item.className = 'report-item';
             
-            // 日付を整形
-            const date = new Date(report.日付).toLocaleDateString();
-
-            // 日報項目のHTMLを構築
+            // HTML要素を動的に生成し、日報を表示する
+            // ★この処理により、画面にフォームではなく整形されたリストが表示されます★
             item.innerHTML = `
                 <div class="report-header">
                     <h3>${report.名前} <span>${report.コンディション}</span></h3>
-                    <div class="report-meta">${date}</div>
+                    <div class="report-meta">
+                        ${new Date(report.日付).toLocaleDateString()}
+                    </div>
                 </div>
                 <p><strong>今日やったこと:</strong> ${report['今日やったこと'] || '---'}</p>
                 <p><strong>翌営業日やること:</strong> ${report['翌営業日やること'] || '---'}</p>
@@ -56,87 +57,13 @@ async function fetchReports() {
             listElement.appendChild(item);
         });
 
-        // いいねボタンにイベントリスナーを設定
-        document.querySelectorAll('.like-button').forEach(button => {
-            button.addEventListener('click', handleLike);
-        });
+        // ... (いいねボタンのイベントリスナー設定) ...
 
     } catch (error) {
         console.error('日報取得エラー:', error);
-        listElement.innerHTML = '<p style="color:red;">日報の読み込みに失敗しました。（ネットワーク/CORSエラーの可能性）</p>';
+        // 3. ネットワークエラーの場合 (画像 6bf823 のケース)
+        listElement.innerHTML = '<p style="color:red;">通信エラーが発生しました。GASのURLとデプロイ設定を確認してください。</p>';
     }
 }
 
-// ------------------------------------------------------------------
-// ★ フォーム送信処理（日報投稿）(機能要件①)
-// ------------------------------------------------------------------
-async function handleFormSubmit(event) {
-    event.preventDefault(); 
-
-    const form = event.target;
-    const formData = new FormData(form);
-    
-    // GASに送るためのデータオブジェクトを作成
-    const data = { action: 'post' }; 
-    for (const [key, value] of formData.entries()) {
-        data[key] = value; 
-    }
-    
-    document.getElementById('submit-btn').disabled = true;
-
-    try {
-        const response = await fetch(GAS_URL, {
-            method: 'POST',
-            body: new URLSearchParams(data) 
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-            alert('日報を送信しました！');
-            form.reset(); 
-            fetchReports(); // 一覧を再取得して更新
-        } else {
-            alert('送信失敗: ' + (result.message || '不明なエラー'));
-        }
-
-    } catch (error) {
-        alert('ネットワークエラーにより送信できませんでした。');
-        console.error('投稿エラー:', error);
-    } finally {
-        document.getElementById('submit-btn').disabled = false;
-    }
-}
-
-// ------------------------------------------------------------------
-// ★ いいねボタンクリック処理 (機能要件③)
-// ------------------------------------------------------------------
-async function handleLike(event) {
-    const button = event.target;
-    const reportId = button.getAttribute('data-id');
-
-    button.disabled = true; 
-
-    try {
-        const response = await fetch(GAS_URL, {
-            method: 'POST',
-            body: new URLSearchParams({ 
-                action: 'like', 
-                id: reportId
-            }) 
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === 'success') {
-            fetchReports(); // 成功したら一覧を再読み込みしてカウントを更新
-        } else {
-            alert('いいね失敗: ' + result.message);
-        }
-
-    } catch (error) {
-        console.error('いいね処理エラー:', error);
-    } finally {
-        button.disabled = false;
-    }
-}
+// ... (handleFormSubmit, handleLike 関数は省略) ...

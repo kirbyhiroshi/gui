@@ -1,5 +1,5 @@
 // ★★★★ 必須：デプロイで取得したウェブアプリのURLに置き換えてください ★★★★
-const GAS_URL = 'https://script.google.com/a/macros/toho-next.com/s/AKfycbyKpw8OmyCVimgD4msNdhNxzhOfNWYZBDNyoQ1rDgGOdcqzdYU92iuy6Tir3zFKfeAorQ/exec'; 
+const GAS_URL = 'あなたのGASウェブアプリURL'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     // ページ読み込み時に日報一覧を取得・表示
@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formElement) {
         formElement.addEventListener('submit', handleFormSubmit);
     }
-    
-    // 他にも、更新ボタンなどがあればここでイベントを設定するが、今回は省略
 });
 
 // ------------------------------------------------------------------
@@ -27,7 +25,7 @@ async function fetchReports() {
         
         listElement.innerHTML = ''; 
 
-        // エラーメッセージが返ってきた場合
+        // データベース接続エラーが返ってきた場合 (画像 6c0ec0 のエラー対応)
         if (reports.error) {
             listElement.innerHTML = `<p style="color:red;">エラー発生: ${reports.error}</p>`;
             return;
@@ -38,15 +36,13 @@ async function fetchReports() {
             return;
         }
 
-        // 正常なデータが返ってきた場合、データを一つずつ画面に表示
         reports.forEach(report => {
             const item = document.createElement('div');
             item.className = 'report-item';
             
-            // 日付を整形
             const date = new Date(report.日付).toLocaleDateString();
 
-            // HTML要素を動的に生成し、日報を表示
+            // HTML要素を動的に生成し、日報を表示する
             item.innerHTML = `
                 <div class="report-header">
                     <h3>${report.名前} <span>${report.コンディション}</span></h3>
@@ -69,6 +65,7 @@ async function fetchReports() {
 
     } catch (error) {
         console.error('日報取得エラー:', error);
+        // ネットワークエラーの場合 (画像 6bf823, 620452 のエラー対応)
         listElement.innerHTML = '<p style="color:red;">通信エラーが発生しました。GASのURLとデプロイ設定を確認してください。</p>';
     }
 }
@@ -78,62 +75,40 @@ async function fetchReports() {
 // ★ フォーム送信処理（日報投稿）(機能要件①)
 // ------------------------------------------------------------------
 async function handleFormSubmit(event) {
-    event.preventDefault(); // フォームのデフォルト送信を防ぐ
+    event.preventDefault(); 
 
     const form = event.target;
     const formData = new FormData(form);
-    
-    // GASに送るためのデータオブジェクトを作成
     const data = { action: 'post' }; 
+    
     for (const [key, value] of formData.entries()) {
         data[key] = value; 
     }
     
     document.getElementById('submit-btn').disabled = true;
 
-   // handleFormSubmit 関数内の try ブロック
-// handleFormSubmit 関数内の try ブロック
-try {
-    const response = await fetch(GAS_URL, {
-        method: 'POST',
-        body: new URLSearchParams(data) // POSTデータとして送信
-    });
+    try {
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            body: new URLSearchParams(data) 
+        });
 
-    // 1. HTTPステータスが正常かチェック (404/500エラー対策)
-    if (!response.ok) {
-        throw new Error(`HTTPエラーが発生しました。ステータス: ${response.status}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            alert('日報を送信しました！');
+            form.reset(); 
+            fetchReports(); // 一覧を再取得して更新
+        } else {
+            alert('送信失敗: ' + (result.message || '不明なエラー'));
+        }
+
+    } catch (error) {
+        alert('ネットワークエラーにより送信できませんでした。');
+        console.error('投稿エラー:', error);
+    } finally {
+        document.getElementById('submit-btn').disabled = false;
     }
-
-    // 2. レスポンスのテキストを一旦すべて取得
-    const responseText = await response.text();
-    
-    let result;
-    // 3. レスポンスボディが空でないか、'<'や'<'などで始まっていないか確認（GASがHTMLやエラーを返していないか確認）
-    if (responseText && responseText.trim().startsWith('{')) {
-        // JSON形式と判断できる場合のみJSONとして解析
-        result = JSON.parse(responseText);
-    } else {
-        // 空、またはJSONではないレスポンスが返された場合
-        throw new Error(`GASからの応答が不正です: ${responseText || '応答なし'}`);
-    }
-
-
-    if (result.status === 'success') {
-        alert('日報を送信しました！');
-        form.reset(); // フォームをクリア
-        fetchReports(); // 一覧を再取得して更新
-    } else {
-        // GAS側で意図的に返されたエラーメッセージを表示
-        alert('送信失敗: ' + (result.message || '不明なエラー'));
-    }
-
-} catch (error) {
-    // ネットワークエラー、HTTPエラー、JSON解析エラーを捕捉
-    alert('送信できませんでした。原因: ' + error.message);
-    console.error('投稿エラー:', error);
-} finally {
-    document.getElementById('submit-btn').disabled = false;
-}
 }
 
 // ------------------------------------------------------------------
@@ -143,13 +118,13 @@ async function handleLike(event) {
     const button = event.target;
     const reportId = button.getAttribute('data-id');
 
-    button.disabled = true; // 連打防止
+    button.disabled = true; 
 
     try {
         const response = await fetch(GAS_URL, {
             method: 'POST',
             body: new URLSearchParams({ 
-                action: 'like', // GASにいいね処理だと伝える
+                action: 'like', 
                 id: reportId
             }) 
         });

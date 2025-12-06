@@ -92,20 +92,31 @@ async function handleFormSubmit(event) {
     document.getElementById('submit-btn').disabled = true;
 
    // handleFormSubmit 関数内の try ブロック
+// handleFormSubmit 関数内の try ブロック
 try {
     const response = await fetch(GAS_URL, {
         method: 'POST',
         body: new URLSearchParams(data) // POSTデータとして送信
     });
 
-    // ★★★ 修正箇所 1: レスポンスステータスのチェック ★★★
+    // 1. HTTPステータスが正常かチェック (404/500エラー対策)
     if (!response.ok) {
-        // HTTPステータスコードが200番台でない場合 (404や500エラーなど)
         throw new Error(`HTTPエラーが発生しました。ステータス: ${response.status}`);
     }
 
-    // ★★★ 修正箇所 2: JSON解析 ★★★
-    const result = await response.json();
+    // 2. レスポンスのテキストを一旦すべて取得
+    const responseText = await response.text();
+    
+    let result;
+    // 3. レスポンスボディが空でないか、'<'や'<'などで始まっていないか確認（GASがHTMLやエラーを返していないか確認）
+    if (responseText && responseText.trim().startsWith('{')) {
+        // JSON形式と判断できる場合のみJSONとして解析
+        result = JSON.parse(responseText);
+    } else {
+        // 空、またはJSONではないレスポンスが返された場合
+        throw new Error(`GASからの応答が不正です: ${responseText || '応答なし'}`);
+    }
+
 
     if (result.status === 'success') {
         alert('日報を送信しました！');
@@ -117,7 +128,7 @@ try {
     }
 
 } catch (error) {
-    // ネットワークエラー、または上記でスローされたHTTPエラーを捕捉
+    // ネットワークエラー、HTTPエラー、JSON解析エラーを捕捉
     alert('送信できませんでした。原因: ' + error.message);
     console.error('投稿エラー:', error);
 } finally {

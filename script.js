@@ -1,5 +1,5 @@
 // ★★★★ 必須：デプロイで取得したウェブアプリのURLに置き換えてください ★★★★
-const GAS_URL = 'あなたのGASウェブアプリURL'; 
+const GAS_URL = 'https://script.google.com/a/macros/toho-next.com/s/AKfycbyKpw8OmyCVimgD4msNdhNxzhOfNWYZBDNyoQ1rDgGOdcqzdYU92iuy6Tir3zFKfeAorQ/exec'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     // ページ読み込み時に日報一覧を取得・表示
